@@ -1,0 +1,22 @@
+{
+  "userList": [
+    {
+      "id": "admin_1",
+      "username": "admin",
+      "password": "admin123",
+      "role": "admin",
+      "expireDate": "2030-01-01",
+      "status": "enable"
+    }
+  ],
+  "payQrcode": "",
+  "payOwner": "便利店管理",
+  "contactInfo": "电话13800000000",
+  "renewalLog": [],
+  "unreadRenewal": [],
+  "useLog": [],
+  "loginSessions": {},
+  "renewalApply": [],
+  "auditResult": [],
+  "dataVersion": 1
+}
