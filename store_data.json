@@ -3,10 +3,26 @@
     {
       "id": "admin_1",
       "username": "admin",
-      "password": "admin123",
+      "password": "admin8835865",
       "role": "admin",
-      "expireDate": "2036-03-07",
+      "expireDate": "2030-01-01",
       "status": "enable"
+    },
+    {
+      "username": "A00188",
+      "password": "123456",
+      "expireDate": "2026-03-31",
+      "role": "user",
+      "status": "enable",
+      "id": "store_1"
+    },
+    {
+      "username": "A00189",
+      "password": "123456",
+      "expireDate": "2026-03-10",
+      "role": "user",
+      "status": "enable",
+      "id": "user_1773158187766"
     }
   ],
   "payQrcode": "",
@@ -18,8 +34,44 @@
     {
       "user": "admin",
       "action": "登录系统",
-      "time": "2026-03-10 15:49:09",
+      "time": "2026-03-10 23:55:59",
       "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-07 00:46:11",
+      "device": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/5"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-07 00:45:35",
+      "device": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/5"
+    },
+    {
+      "user": "admin",
+      "action": "核对商品：奥利奥可可脆卷（浓郁巧克力味）50g（条码：6901668936271，实到5件）",
+      "time": "2026-03-07 00:28:40",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "上传配送单：配送收货单-明细数据.xls（共36个商品）",
+      "time": "2026-03-07 00:28:28",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-07 00:28:23",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-07 00:16:40",
+      "device": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/5"
     }
   ]
 }
