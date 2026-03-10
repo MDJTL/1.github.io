@@ -361,13 +361,9 @@
       </div>
       <!-- 自动续期输入框 -->
       <div style="margin:15px 0; text-align:left; padding:0 10px;">
-  <label class="admin-form-label" style="margin-bottom:8px; font-size:14px;">选择续费套餐（输入天数自动计算费用）</label>
-  <div style="font-size:12px; color:#ff7a45; margin-bottom:5px;">
-    📌 套餐参考：30天(99元) | 180天(499元) | 365天(899元)
-  </div>
-  <input type="number" class="admin-form-input" id="expireAddDays" min="7" placeholder="输入续期天数（如30/180/365）" style="width:100%;">
-  <div id="priceTip" style="font-size:12px; color:#666; margin-top:5px;"></div>
-</div>
+        <label class="admin-form-label" style="margin-bottom:8px; font-size:14px;">付费后输入续期天数</label>
+        <input type="number" class="admin-form-input" id="expireAddDays" min="7" placeholder="" style="width:100%;">
+      </div>
       <button class="modal-btn modal-btn-confirm" id="confirmExpireBtn" style="width:95%; margin:0 auto 10px; display:block;">确认付费，自动续期</button>
       <div class="contact-info" id="payContactInfo">
         管理员联系方式：<br>
@@ -421,20 +417,14 @@
     };
 
     // --------------- 系统配置（可修改这里的默认信息）---------------
-const SYSTEM_CONFIG = {
-  adminDefaultPwd: 'admin123', // 默认管理员密码（登录后建议修改）
-  defaultExpireDays: 30,        // 新门店账号默认有效期（天）
-  minPwdLength: 6,              // 密码最小长度
-  expireWarnDays: 3,            // 到期提醒天数（提前3天提醒）
-  defaultPayOwner: '便利店管理', // 付款对象名称
-  defaultContact: '电话13800000000', // 管理员联系方式
-  // 新增价格套餐配置
-  pricePackages: {
-    monthly: { days: 30, price: 99 },    // 月套餐
-    halfYear: { days: 180, price: 499 }, // 半年套餐
-    yearly: { days: 365, price: 899 }    // 年套餐
-  }
-};
+    const SYSTEM_CONFIG = {
+      adminDefaultPwd: 'admin123', // 默认管理员密码（登录后建议修改）
+      defaultExpireDays: 30,        // 新门店账号默认有效期（天）
+      minPwdLength: 6,              // 密码最小长度
+      expireWarnDays: 3,            // 到期提醒天数（提前3天提醒）
+      defaultPayOwner: '便利店管理', // 付款对象名称
+      defaultContact: '电话13800000000' // 管理员联系方式
+    };
 
     // --------------- 全局核心数据（从仓库同步）---------------
     let GLOBAL_DATA = {
@@ -806,56 +796,17 @@ const SYSTEM_CONFIG = {
       } else {
         const diffDays = getDateDiff(new Date(), new Date(LOCAL_STATE.currentUser.expireDate));
         if (diffDays < 0) {
-  el.expireInfo.textContent = '账号已过期，请续费';
-  el.expireInfo.className = 'expire-info expire-warning';
-  // 核心修复：只弹出续费窗口，暂时不登出（登出逻辑放到续费成功后）
-  setTimeout(() => { showExpirePayModal(); }, 2000);
+          el.expireInfo.textContent = '账号已过期，请续费';
+          el.expireInfo.className = 'expire-info expire-warning';
+          setTimeout(() => { forceLogout(); showExpirePayModal(); }, 2000);
         } else if (checkExpireWarn(LOCAL_STATE.currentUser)) {
           el.expireInfo.textContent = `有效期至：${LOCAL_STATE.currentUser.expireDate}（剩余${diffDays}天，即将到期）`;
           el.expireInfo.className = 'expire-info expire-warning';
           showToast(`账号即将到期，剩余${diffDays}天`);
         } else {
-  el.expireInfo.textContent = `有效期至：${LOCAL_STATE.currentUser.expireDate}（剩余${diffDays}天）`;
-  el.expireInfo.className = 'expire-info';
-}
-// 驳回续费申请（新增函数）
-function rejectRenewal(index) {
-  if (!confirm('确定驳回该续费申请吗？')) {
-    return;
-  }
-  
-  // 更新日志状态
-  GLOBAL_DATA.renewalLog[index].status = '已驳回';
-  GLOBAL_DATA.renewalLog[index].rejectTime = formatDateTime(new Date());
-  
-  // 保存数据
-  saveToRepo();
-  
-  // 重新渲染日志
-  renderRenewalLog();
-  
-  // 发送提示给门店（这里简化为本地提示，实际可扩展）
-  showToast('续费申请已驳回，门店将收到提醒');
-  
-  // 可选：通知对应门店账号（如果需要主动提醒）
-  const rejectedLog = GLOBAL_DATA.renewalLog[index];
-  const storeUser = GLOBAL_DATA.userList.find(u => u.username === rejectedLog.store);
-  if (storeUser) {
-    // 这里可以添加门店登录时的提示逻辑
-    storeUser.rejectTip = `你的续费申请已被驳回：未收到费用，请重新付费`;
-  }
-}
-
-// 新增：检查是否有驳回提示
-if (LOCAL_STATE.currentUser && LOCAL_STATE.currentUser.rejectTip) {
-  showToast(LOCAL_STATE.currentUser.rejectTip, 5000);
-  // 清空提示（只显示一次）
-  const userIndex = GLOBAL_DATA.userList.findIndex(u => u.username === LOCAL_STATE.currentUser.username);
-  if (userIndex !== -1) {
-    delete GLOBAL_DATA.userList[userIndex].rejectTip;
-    saveToRepo();
-  }
-}
+          el.expireInfo.textContent = `有效期至：${LOCAL_STATE.currentUser.expireDate}（剩余${diffDays}天）`;
+          el.expireInfo.className = 'expire-info';
+        }
       }
       // 更新点货UI
       updateProgress();
@@ -1257,39 +1208,21 @@ if (LOCAL_STATE.currentUser && LOCAL_STATE.currentUser.rejectTip) {
     }
 
     // 渲染续期日志
-function renderRenewalLog() {
-  if (GLOBAL_DATA.renewalLog.length === 0) {
-    el.renewalLogList.innerHTML = '暂无续期记录';
-    return;
-  }
-  el.renewalLogList.innerHTML = '';
-  GLOBAL_DATA.renewalLog.forEach((log, index) => {
-    const item = document.createElement('div');
-    item.className = 'log-item';
-    
-    // 状态样式
-    let statusText = '';
-    let statusClass = '';
-    let rejectBtn = '';
-    
-    if (log.status === '待确认') {
-      statusText = '<span style="color:#ff7a45;">待确认</span>';
-      // 仅管理员可看到驳回按钮
-      if (LOCAL_STATE.currentUser && LOCAL_STATE.currentUser.role === 'admin') {
-        rejectBtn = `<button class="disable-btn" style="padding:2px 6px; font-size:11px; margin-left:8px;" onclick="rejectRenewal(${index})">驳回</button>`;
+    function renderRenewalLog() {
+      if (GLOBAL_DATA.renewalLog.length === 0) {
+        el.renewalLogList.innerHTML = '暂无续期记录';
+        return;
       }
-    } else if (log.status === '已确认') {
-      statusText = '<span style="color:#00b42a;">已确认</span>';
-    } else if (log.status === '已驳回') {
-      statusText = '<span style="color:#f5222d;">已驳回</span>';
+      el.renewalLogList.innerHTML = '';
+      GLOBAL_DATA.renewalLog.forEach(log => {
+        const item = document.createElement('div');
+        item.className = 'log-item';
+        item.innerHTML = `
+          ${log.time} | ${log.store} | 续期${log.days}天 | 收费${log.money}元
+        `;
+        el.renewalLogList.appendChild(item);
+      });
     }
-    
-    item.innerHTML = `
-      ${log.time} | ${log.store} | 续期${log.days}天 | 收费${log.money}元 | ${statusText} ${rejectBtn}
-    `;
-    el.renewalLogList.appendChild(item);
-  });
-}
 
     // 渲染使用日志
     function renderUseLog() {
@@ -1330,79 +1263,39 @@ function renderRenewalLog() {
     }
 
     // 确认续费
-async function confirmExpire() {
-  // 终极修复：跳过LOCAL_STATE，直接从GLOBAL_DATA找已登录的门店（避免状态丢失）
-  let currentUser = null;
-  // 方案1：如果有登录页的用户名输入框，直接取输入的用户名
-  if (el.usernameInput && el.usernameInput.value) {
-    currentUser = GLOBAL_DATA.userList.find(u => u.username === el.usernameInput.value);
-  }
-  // 方案2：如果没有输入框，取GLOBAL_DATA中最后登录的门店（非管理员）
-  else {
-    currentUser = GLOBAL_DATA.userList.find(u => u.role !== 'admin' && u.username);
-  }
-
-  // 校验用户是否存在
-  if (!currentUser) {
-    showToast('无法识别当前门店账号，请返回登录页重新登录');
-    el.expirePayModal.style.display = 'none';
-    return;
-  }
-
-  const days = Number(el.expireAddDays.value);
-  if (!days || days < 7) {
-    showToast('续期天数最少7天');
-    return;
-  }
-  
-  // 找到当前门店账号（基于全局数据，不再依赖LOCAL_STATE）
-  const userIndex = GLOBAL_DATA.userList.findIndex(u => u.username === currentUser.username);
-  if (userIndex === -1) {
-    showToast('账号不存在，请联系管理员');
-    return;
-  }
-  
-  // 计算新的到期时间
-  const currentExpireDate = new Date(GLOBAL_DATA.userList[userIndex].expireDate);
-  const today = new Date();
-  const startDate = currentExpireDate < today ? today : currentExpireDate;
-  const newExpire = new Date(startDate);
-  newExpire.setDate(newExpire.getDate() + days);
-  GLOBAL_DATA.userList[userIndex].expireDate = formatDate(newExpire);
-  
-  // 计算实际费用
-const money = calculatePrice(days);
-
-// 记录续期日志（用全局数据中的门店名称）
-const log = {
-  store: currentUser.username,
-  days: days,
-  money: money,
-  time: formatDateTime(new Date()),
-  operator: '门店自助',
-  status: '待确认'
-};
-  
-  if (!GLOBAL_DATA.renewalLog) GLOBAL_DATA.renewalLog = [];
-  if (!GLOBAL_DATA.unreadRenewal) GLOBAL_DATA.unreadRenewal = [];
-  
-  GLOBAL_DATA.renewalLog.unshift(log);
-  GLOBAL_DATA.unreadRenewal.push(log);
-  
-  // 保存数据
-  const saveSuccess = await saveToRepo();
-  if (!saveSuccess) {
-    showToast('续费申请保存失败，请重试');
-    return;
-  }
-  
-  // 关闭弹窗+登出（此时才执行登出）
-  el.expirePayModal.style.display = 'none';
-  showToast(`续费申请提交成功！已申请续期${days}天，请等待管理员确认。`);
-  
-  // 最后登出，不影响前面的逻辑
-  forceLogout();
-}
+    async function confirmExpire() {
+      const days = Number(el.expireAddDays.value);
+      if (!days || days < 7) {
+        showToast('续期天数最少7天');
+        return;
+      }
+      // 找到当前门店账号
+      const userIndex = GLOBAL_DATA.userList.findIndex(u => u.username === LOCAL_STATE.currentUser.username);
+      if (userIndex === -1) {
+        showToast('账号不存在');
+        return;
+      }
+      // 计算新的到期时间
+      const newExpire = new Date(GLOBAL_DATA.userList[userIndex].expireDate);
+      newExpire.setDate(newExpire.getDate() + days);
+      GLOBAL_DATA.userList[userIndex].expireDate = formatDate(newExpire);
+      // 记录续期日志
+      const log = {
+        store: LOCAL_STATE.currentUser.username,
+        days: days,
+        money: 0, // 门店端无法填写金额，管理员后台补充
+        time: formatDateTime(new Date()),
+        operator: '门店自助'
+      };
+      GLOBAL_DATA.renewalLog.unshift(log);
+      GLOBAL_DATA.unreadRenewal.push(log);
+      // 保存到本地
+      await saveToRepo();
+      // 关闭弹窗，重新登录
+      el.expirePayModal.style.display = 'none';
+      showToast('续期申请已提交，请等待管理员确认');
+      forceLogout();
+    }
 
     // --------------- 商品点货功能 ---------------
     function readExcel(file) {
@@ -1778,12 +1671,11 @@ const log = {
 
     // --------------- 初始化 ---------------
     async function init() {
-  // 先从仓库加载数据
-  await loadFromRepo();
-  bindEvents();
-  bindPriceTip(); // 新增：绑定价格提示
-  showToast('系统加载完成，数据已同步');
-}
+      // 先从仓库加载数据
+      await loadFromRepo();
+      bindEvents();
+      showToast('系统加载完成，数据已同步');
+    }
 
     // 启动系统
     init();
