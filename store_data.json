@@ -19,10 +19,18 @@
     {
       "username": "A00189",
       "password": "123456",
+      "expireDate": "2026-04-09",
+      "role": "user",
+      "status": "enable",
+      "id": "user_1773158852724"
+    },
+    {
+      "username": "A00187",
+      "password": "123456",
       "expireDate": "2026-03-10",
       "role": "user",
       "status": "enable",
-      "id": "user_1773158187766"
+      "id": "user_1773158870916"
     }
   ],
   "payQrcode": "",
@@ -34,7 +42,19 @@
     {
       "user": "admin",
       "action": "登录系统",
-      "time": "2026-03-10 23:55:59",
+      "time": "2026-03-11 00:05:51",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "A00188",
+      "action": "退出系统",
+      "time": "2026-03-11 00:05:26",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "A00188",
+      "action": "登录系统",
+      "time": "2026-03-11 00:05:23",
       "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
     },
     {
