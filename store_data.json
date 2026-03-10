@@ -5,7 +5,7 @@
       "username": "admin",
       "password": "admin123",
       "role": "admin",
-      "expireDate": "2030-01-01",
+      "expireDate": "2036-03-07",
       "status": "enable"
     }
   ],
@@ -14,9 +14,12 @@
   "contactInfo": "电话13800000000",
   "renewalLog": [],
   "unreadRenewal": [],
-  "useLog": [],
-  "loginSessions": {},
-  "renewalApply": [],
-  "auditResult": [],
-  "dataVersion": 1
+  "useLog": [
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-10 15:49:09",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    }
+  ]
 }
