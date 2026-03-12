@@ -1,0 +1,173 @@
+{
+  "userList": [
+    {
+      "id": "admin_1",
+      "username": "admin",
+      "password": "admin8835865",
+      "role": "admin",
+      "expireDate": "2030-01-01",
+      "status": "enable"
+    },
+    {
+      "username": "A00188",
+      "password": "123456",
+      "expireDate": "2026-03-31",
+      "role": "user",
+      "status": "enable",
+      "id": "store_1"
+    },
+    {
+      "username": "A00189",
+      "password": "123456",
+      "expireDate": "2026-03-12",
+      "role": "user",
+      "status": "enable",
+      "id": "user_1773321739273"
+    },
+    {
+      "username": "A00187",
+      "password": "123456",
+      "expireDate": "2026-04-11",
+      "role": "user",
+      "status": "enable",
+      "id": "user_1773323709133"
+    },
+    {
+      "username": "A00190",
+      "password": "123456",
+      "expireDate": "2026-03-10",
+      "role": "user",
+      "status": "enable",
+      "id": "user_1773323733198"
+    }
+  ],
+  "payQrcode": "",
+  "payOwner": "便利店管理",
+  "contactInfo": "电话13800000000",
+  "renewalLog": [
+    {
+      "username": "A00189",
+      "addDays": 30,
+      "auditTime": "2026-03-12 21:33:24",
+      "remark": "审核驳回",
+      "status": "rejected"
+    }
+  ],
+  "unreadRenewal": [],
+  "useLog": [
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-12 21:56:19",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "A00187",
+      "action": "退出系统",
+      "time": "2026-03-12 21:56:00",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "A00187",
+      "action": "登录系统",
+      "time": "2026-03-12 21:55:57",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "退出系统",
+      "time": "2026-03-12 21:55:43",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-12 21:54:17",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "导出数据备份",
+      "time": "2026-03-12 21:34:02",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-12 21:33:17",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-12 21:32:19",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-12 21:21:46",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "上传配送单：配送收货单-明细数据.xls（35个商品）",
+      "time": "2026-03-11 23:58:49",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-11 23:58:28",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "退出系统",
+      "time": "2026-03-11 00:11:04",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-11 00:10:48",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-07 00:46:11",
+      "device": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/5"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-07 00:45:35",
+      "device": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/5"
+    },
+    {
+      "user": "admin",
+      "action": "核对商品：奥利奥可可脆卷（浓郁巧克力味）50g（条码：6901668936271，实到5件）",
+      "time": "2026-03-07 00:28:40",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "上传配送单：配送收货单-明细数据.xls（共36个商品）",
+      "time": "2026-03-07 00:28:28",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-07 00:28:23",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-07 00:16:40",
+      "device": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/5"
+    }
+  ]
+}
