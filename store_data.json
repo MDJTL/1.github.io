@@ -17,12 +17,20 @@
       "id": "store_1"
     },
     {
-      "username": "A00189",
+      "username": "A00187",
       "password": "123456",
-      "expireDate": "2026-03-12",
+      "expireDate": "2026-03-04",
       "role": "user",
       "status": "enable",
-      "id": "user_1773321739273"
+      "id": "user_1773328427050"
+    },
+    {
+      "username": "A00189",
+      "password": "123456",
+      "expireDate": "2026-04-11",
+      "role": "user",
+      "status": "enable",
+      "id": "user_1773331573880"
     }
   ],
   "payQrcode": "",
@@ -32,53 +40,123 @@
     {
       "username": "A00189",
       "addDays": 30,
-      "auditTime": "2026-03-12 21:33:24",
+      "auditTime": "2026-03-12 23:57:31",
       "remark": "审核驳回",
       "status": "rejected"
+    },
+    {
+      "username": "A00189",
+      "addDays": 30,
+      "auditTime": "2026-03-12 23:17:20",
+      "remark": "审核驳回",
+      "status": "rejected"
+    },
+    {
+      "username": "A00189",
+      "addDays": 30,
+      "oldExpire": "2026-04-11",
+      "newExpire": "2026-04-11",
+      "auditTime": "2026-03-12 23:15:34",
+      "remark": "审核通过，已续期",
+      "status": "approved"
     }
   ],
   "unreadRenewal": [],
   "useLog": [
     {
       "user": "admin",
-      "action": "登录系统",
-      "time": "2026-03-12 21:33:17",
+      "action": "导出数据备份",
+      "time": "2026-03-13 00:05:34",
       "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
     },
     {
       "user": "admin",
       "action": "登录系统",
-      "time": "2026-03-12 21:32:19",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "登录系统",
-      "time": "2026-03-12 21:21:46",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "上传配送单：配送收货单-明细数据.xls（35个商品）",
-      "time": "2026-03-11 23:58:49",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "登录系统",
-      "time": "2026-03-11 23:58:28",
+      "time": "2026-03-12 23:58:04",
       "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
     },
     {
       "user": "admin",
       "action": "退出系统",
-      "time": "2026-03-11 00:11:04",
+      "time": "2026-03-12 23:57:35",
       "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
     },
     {
       "user": "admin",
       "action": "登录系统",
-      "time": "2026-03-11 00:10:48",
+      "time": "2026-03-12 23:57:24",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "退出系统",
+      "time": "2026-03-12 23:56:54",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-12 23:56:27",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-12 23:17:09",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "退出系统",
+      "time": "2026-03-12 23:16:40",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-12 23:16:22",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-12 23:15:29",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "退出系统",
+      "time": "2026-03-12 23:14:52",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-12 23:14:35",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "退出系统",
+      "time": "2026-03-12 23:13:51",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-12 23:13:18",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "退出系统",
+      "time": "2026-03-12 23:11:57",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
+    },
+    {
+      "user": "admin",
+      "action": "登录系统",
+      "time": "2026-03-12 23:11:41",
       "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
     },
     {
