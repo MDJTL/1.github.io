@@ -1,12 +1,436 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <!-- 原有样式保持不变 -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>便利店点货系统（收费管理版）</title>
+  <style>
+    /* 原有样式保持不变 */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+    body { background: #f5f5f5; min-height: 100vh; display: flex; flex-direction: column; }
+    /* 登录页样式 */
+    .login-container { width: 100%; max-width: 350px; margin: 50px auto; padding: 0 15px; }
+    .login-card { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .login-title { font-size: 20px; font-weight: bold; color: #333; text-align: center; margin-bottom: 25px; }
+    .form-group { margin-bottom: 20px; }
+    .form-label { font-size: 14px; color: #666; margin-bottom: 8px; display: block; }
+    .form-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+    .login-btn { width: 100%; padding: 12px; background: #1989fa; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+    .login-tip { text-align: center; color: #f5222d; font-size: 13px; margin-top: 15px; display: none; }
+    /* 主页面样式 */
+    .header { background: #1989fa; color: white; text-align: center; padding: 15px; font-size: 18px; font-weight: bold; position: fixed; top: 0; left: 0; right: 0; z-index: 10; }
+    .user-info-bar { background: #e6f7ff; color: #1890ff; padding: 8px 15px; font-size: 13px; margin-top: 60px; display: flex; justify-content: space-between; align-items: center; }
+    .expire-info { color: #ff7a45; font-weight: bold; }
+    .expire-warning { color: #f5222d; font-weight: bold; animation: blink 1.5s infinite; }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .container { padding: 15px; flex: 1; }
+    .card { background: white; border-radius: 8px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .card-title { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+    .admin-btn { padding: 6px 10px; background: #ff7a45; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; margin-left: 8px; display: none; }
+    .logout-btn { padding: 6px 10px; background: #f5222d; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; }
+    .btn { padding: 10px 15px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
+    .btn-primary { background: #1989fa; color: white; width: 100%; margin-top: 10px; }
+    .btn-danger { background: #f5222d; color: white; font-size: 13px; padding: 6px 12px; margin-top: 10px; }
+    .btn-success { background: #00b42a; color: white; font-size: 13px; padding: 6px 12px; margin-top: 10px; }
+    .scan-box { border: 2px dashed #1989fa; border-radius: 8px; padding: 30px 10px; text-align: center; color: #1989fa; margin: 15px 0; cursor: pointer; }
+    .scan-icon { font-size: 40px; margin-bottom: 10px; }
+    .input-box { margin: 15px 0; }
+    .input-label { font-size: 14px; color: #666; margin-bottom: 5px; display: block; }
+    .input-field { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+    .progress-bar { height: 6px; background: #eee; border-radius: 3px; margin-top: 10px; }
+    .progress-fill { height: 100%; background: #1989fa; border-radius: 3px; }
+    .progress-text { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin-top: 5px; }
+    .goods-list { max-height: 250px; overflow-y: auto; margin-top: 10px; }
+    .goods-item { padding: 10px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+    .goods-item span { color: #666; }
+    .empty-tip { text-align: center; color: #999; padding: 20px; font-size: 14px; }
+    .file-info { font-size: 13px; color: #666; margin-top: 10px; }
+    /* 弹窗通用样式 */
+    .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 100; }
+    .modal-content { background: white; width: 90%; max-width: 350px; border-radius: 8px; padding: 20px; }
+    .modal-title { font-size: 16px; font-weight: bold; color: #333; text-align: center; margin-bottom: 15px; }
+    .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
+    .modal-btn { flex: 1; padding: 10px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
+    .modal-btn-cancel { background: #eee; color: #333; }
+    .modal-btn-confirm { background: #1989fa; color: white; }
+    /* 管理员弹窗样式 */
+    .admin-modal-content { background: white; width: 90%; max-width: 480px; border-radius: 8px; padding: 20px; }
+    .admin-form-group { margin-bottom: 15px; }
+    .admin-form-label { font-size: 14px; color: #666; margin-bottom: 5px; display: block; }
+    .admin-form-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+    .user-item { padding: 10px; border: 1px solid #eee; border-radius: 4px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .user-info { font-size: 14px; }
+    .user-expire { color: #666; font-size: 12px; margin-top: 3px; }
+    .edit-btn, .reset-pwd-btn, .disable-btn, .enable-btn { padding: 4px 8px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; margin-right: 5px; }
+    .edit-btn { background: #1989fa; color: white; }
+    .reset-pwd-btn { background: #ff7a45; color: white; }
+    .disable-btn { background: #f5222d; color: white; }
+    .enable-btn { background: #00b42a; color: white; }
+    /* 收款码设置样式 */
+    .qrcode-setting { border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px; }
+    .qrcode-preview { width: 120px; height: 120px; border: 1px solid #eee; margin: 10px auto; display: flex; justify-content: center; align-items: center; }
+    .qrcode-preview img { max-width: 110px; max-height: 110px; }
+    .upload-qrcode-btn { width: 100%; padding: 8px; background: #eee; color: #333; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; margin-top: 5px; }
+    #qrcodeFileInput { display: none; }
+    /* 到期扫码付费弹窗样式 */
+    .expire-pay-modal-content { background: white; width: 90%; max-width: 320px; border-radius: 8px; padding: 20px; text-align: center; }
+    .qrcode-box { width: 180px; height: 180px; margin: 15px auto; border: 1px solid #eee; display: flex; justify-content: center; align-items: center; background: white; }
+    .qrcode-box img { max-width: 160px; max-height: 160px; }
+    .pay-tip { color: #f5222d; font-size: 14px; margin: 10px 0; }
+    .pay-owner { color: #333; font-size: 13px; margin: 5px 0; font-weight: bold; }
+    .contact-info { font-size: 13px; color: #666; margin-top: 15px; }
+    /* 提示框 */
+    .toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.7); color: white; padding: 10px 20px; border-radius: 6px; font-size: 14px; display: none; z-index: 200; }
+    .sync-tip { position: fixed; top: 20px; right: 20px; background: rgba(0,0,0,0.7); color: white; padding: 8px 15px; border-radius: 4px; font-size: 12px; display: none; z-index: 150; }
+    /* 续费提醒弹窗 */
+    .renewal-notice-modal-content { background: white; width: 90%; max-width: 380px; border-radius: 8px; padding: 25px; text-align: center; }
+    .renewal-icon { font-size: 50px; color: #13c2c2; margin-bottom: 15px; }
+    .renewal-title { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 10px; }
+    .renewal-info { font-size: 14px; line-height: 1.8; color: #666; text-align: left; margin-bottom: 20px; }
+    /* 续期日志+使用日志样式 */
+    .log-section { margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
+    .log-title { font-size: 14px; font-weight: bold; color: #333; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .log-toggle { font-size: 12px; color: #1989fa; cursor: pointer; }
+    .log-list { max-height: 150px; overflow-y: auto; font-size: 12px; color: #666; }
+    .log-item { padding: 6px 0; border-bottom: 1px solid #f5f5f5; }
+    .use-log-item { padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
+    .use-log-time { color: #999; font-size: 11px; }
+    /* 相机扫描弹窗样式 */
+    .scanner-modal-content { background: white; width: 95%; max-width: 500px; border-radius: 8px; padding: 20px; }
+    #reader { width: 100%; }
+    .scanner-close-btn { margin-top: 15px; width: 100%; padding: 10px; background: #f5222d; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
+    .barcode-match-tip { background: #e6f7ff; border: 1px solid #1890ff; color: #1890ff; padding: 10px; border-radius: 4px; margin: 10px 0; font-size: 13px; display: none; }
+    .barcode-match-success { background: #f6ffed; border: 1px solid #00b42a; color: #00b42a; }
+    .barcode-match-error { background: #fff2f0; border: 1px solid #f5222d; color: #f5222d; }
+  </style>
 </head>
 <body>
-  <!-- 原有HTML结构完全不变 -->
-  
-  <!-- 新增Token设置弹窗 -->
+  <!-- 登录页面（默认显示） -->
+  <div id="loginPage" style="display: block;">
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-title">便利店点货系统登录</div>
+        <div class="form-group">
+          <label class="form-label">用户名（门店账号/管理员）</label>
+          <input type="text" class="form-input" id="loginUsername" placeholder="" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <input type="password" class="form-input" id="loginPassword" placeholder="" autocomplete="off">
+        </div>
+        <button class="login-btn" id="loginBtn">登录</button>
+        <div class="login-tip" id="loginTip"></div>
+      </div>
+    </div>
+  </div>
+  <!-- 主页面（登录后显示） -->
+  <div id="mainPage" style="display: none;">
+    <div class="header">便利店点货核对系统</div>
+    <!-- 用户信息栏 -->
+    <div class="user-info-bar" id="userInfoBar">
+      <span id="currentStoreName">当前门店：--</span>
+      <span class="expire-info" id="expireInfo">有效期：--</span>
+      <div>
+        <button class="admin-btn" id="changeAdminPwdBtn">修改管理员密码</button>
+        <button class="logout-btn" id="logoutBtn">退出登录</button>
+      </div>
+    </div>
+    <div class="container">
+      <!-- 数据导出提示卡片（仅管理员可见） -->
+      <div class="card" id="dataSyncCard" style="display: none; background: #fff7e6; border: 1px solid #ffd591;">
+        <div class="card-title" style="color: #d46b08;">数据同步提示</div>
+        <div style="font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 10px;">
+          所有数据保存在本地浏览器中。如需备份或同步到其他设备，请定期导出数据并上传到GitHub。
+        </div>
+        <button class="btn btn-primary" id="quickExportBtn" style="background: #fa8c16; margin-top: 5px;">立即导出数据备份</button>
+      </div>
+      
+      <!-- 上传区域 -->
+      <div class="card">
+        <div class="card-title">
+          配送单管理
+          <button class="admin-btn" id="adminBtn" onclick="document.getElementById('adminModal').style.display='flex'">管理员设置</button>
+        </div>
+        <input type="file" id="fileInput" accept=".xls,.xlsx" style="display: none;">
+        <button class="btn btn-primary" id="uploadBtn">选择配送单Excel</button>
+        <div class="file-info" id="fileInfo"></div>
+        <button class="btn btn-danger" id="deleteBtn" style="display: none;">删除当前配送单</button>
+      </div>
+      <!-- 点货区域 -->
+      <div class="card" id="checkCard" style="display: none;">
+        <div class="card-title">扫码点货</div>
+        <div class="scan-box" id="scanBox">
+          <div class="scan-icon">📷</div>
+          <div>点击输入商品条码（支持后4位）</div>
+        </div>
+        <!-- 相机扫描按钮 -->
+        <button class="btn btn-success" id="cameraScanBtn" style="width: 100%; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 5px;">
+          <span>📷</span> 相机拍照识别条码
+        </button>
+        <div class="barcode-match-tip" id="barcodeMatchTip"></div>
+        <div class="input-box">
+          <label class="input-label">手动输入商品条码（13位完整码或后4位）</label>
+          <input type="text" class="input-field" id="barcodeInput" placeholder="输入后按回车或点确认">
+        </div>
+        <button class="btn btn-primary" id="checkBtn">确认核对</button>
+        <div class="progress-text">
+          <span id="progressTip">已核对：0 / 0</span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+        </div>
+      </div>
+      <!-- 商品列表 -->
+      <div class="card" id="goodsCard" style="display: none;">
+        <div class="card-title">商品清单</div>
+        <div class="goods-list" id="goodsList"></div>
+      </div>
+      <!-- 差异区域 -->
+      <div class="card" id="diffCard" style="display: none;">
+        <div class="card-title">差异提醒</div>
+        <div id="diffList" class="goods-list"></div>
+        <button class="btn btn-primary" id="exportBtn">导出差异报表</button>
+      </div>
+      <!-- 空状态 -->
+      <div class="empty-tip" id="emptyTip">请先上传【配送收货单】Excel开始点货</div>
+    </div>
+  </div>
+  <!-- 数量弹窗 -->
+  <div class="modal" id="quantityModal">
+    <div class="modal-content">
+      <div class="modal-title" id="quantityTitle">请输入实到数量</div>
+      <div class="form-group">
+        <label class="form-label">实到数量</label>
+        <input type="number" class="form-input" id="quantityInput" min="0" value="1">
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-cancel" id="cancelQuantity">取消</button>
+        <button class="modal-btn modal-btn-confirm" id="confirmQuantity">确认</button>
+      </div>
+    </div>
+  </div>
+  <!-- 差异弹窗 -->
+  <div class="modal" id="diffModal">
+    <div class="modal-content">
+      <div class="modal-title" style="color:#f5222d">数量差异</div>
+      <div style="font-size:14px; line-height:1.5; margin-bottom:20px;" id="diffInfo">
+        <!-- 差异内容 -->
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-confirm" id="closeDiff">确认</button>
+      </div>
+    </div>
+  </div>
+  <!-- 管理员弹窗 -->
+  <div class="modal" id="adminModal">
+    <div class="admin-modal-content">
+      <div class="modal-title">管理员权限设置</div>
+      <!-- 管理员密码验证 -->
+      <div id="adminAuth" style="display: block;">
+        <div class="admin-form-group">
+          <label class="admin-form-label">管理员密码</label>
+          <input type="password" class="admin-form-input" id="adminPassword" placeholder="">
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn modal-btn-cancel" id="cancelAdminAuth">取消</button>
+          <button class="modal-btn modal-btn-confirm" id="confirmAdminAuth">确认</button>
+        </div>
+      </div>
+      <!-- 权限管理（验证后显示） -->
+      <div id="adminManage" style="display: none;">
+        <div style="margin-bottom:15px;">
+          <button class="modal-btn modal-btn-confirm" id="addUserBtn" style="flex: none; width: auto; padding: 8px 15px;">新增门店账号</button>
+          <button class="modal-btn modal-btn-confirm" id="exportDataBtn" style="flex: none; width: auto; padding: 8px 15px; background:#13c2c2;">导出数据</button>
+          <button class="modal-btn modal-btn-confirm" id="importDataBtn" style="flex: none; width: auto; padding: 8px 15px; background:#722ed1;">导入数据</button>
+          <button class="modal-btn modal-btn-confirm" id="tokenSettingBtn" style="flex: none; width: auto; padding: 8px 15px; background:#1890ff; margin-left: 8px;">⚙️ Token设置</button>
+          <button class="modal-btn modal-btn-confirm" id="syncNowBtn" style="flex: none; width: auto; padding: 8px 15px; background:#52c41a; margin-left: 8px;">🔄 立即同步</button>
+        </div>
+        <div id="userList" style="max-height:250px; overflow-y:auto; margin-bottom:15px;">
+          <!-- 用户列表（门店账号） -->
+        </div>
+        <!-- 续期日志 -->
+        <div class="log-section">
+          <div class="log-title">
+            门店续期日志
+            <span class="log-toggle" id="toggleRenewalLog">收起</span>
+          </div>
+          <div class="log-list" id="renewalLogList">暂无续期记录</div>
+        </div>
+        <!-- 门店使用日志 -->
+        <div class="log-section">
+          <div class="log-title">
+            门店使用日志（实时监控）
+            <span class="log-toggle" id="toggleUseLog">展开</span>
+          </div>
+          <div class="log-list" id="useLogList" style="display: none;">暂无门店使用记录</div>
+        </div>
+        <!-- 收款码设置区域 -->
+        <div class="qrcode-setting">
+          <div class="admin-form-label" style="font-weight:bold;">收款二维码设置（门店付费扫码用）</div>
+          <div class="qrcode-preview" id="qrcodePreview">
+            <img id="previewImg" src="" alt="暂无收款码" style="display: none;">
+            <span id="noQrcodeTip" style="color:#999; font-size:12px;">暂无收款码</span>
+          </div>
+          <input type="file" id="qrcodeFileInput" accept="image/*">
+          <button class="upload-qrcode-btn" id="uploadQrcodeBtn">点击上传你的收款二维码（微信/支付宝）</button>
+          <div class="admin-form-group">
+            <label class="admin-form-label">你的联系方式（门店付费后联系你）</label>
+            <input type="text" class="admin-form-input" id="adminContactInput" placeholder="" value="">
+          </div>
+          <button class="modal-btn modal-btn-confirm" id="saveContactBtn" style="width:100%; margin-top:5px;">保存联系方式</button>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn modal-btn-cancel" id="closeAdminModal">关闭</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 新增/编辑用户弹窗 -->
+  <div class="modal" id="userModal">
+    <div class="modal-content">
+      <div class="modal-title" id="userModalTitle">新增门店账号</div>
+      <div class="admin-form-group">
+        <label class="admin-form-label">用户名（门店名称）</label>
+        <input type="text" class="admin-form-input" id="userUsername" placeholder="">
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-form-label">账号密码</label>
+        <input type="password" class="admin-form-input" id="userPassword" placeholder="">
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-form-label">使用有效期</label>
+        <input type="date" class="admin-form-input" id="userExpireDate">
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-cancel" id="cancelUser">取消</button>
+        <button class="modal-btn modal-btn-confirm" id="confirmUser">确认</button>
+      </div>
+    </div>
+  </div>
+  <!-- 管理员修改密码弹窗 -->
+  <div class="modal" id="changeAdminPwdModal">
+    <div class="modal-content">
+      <div class="modal-title">修改管理员密码</div>
+      <div class="admin-form-group">
+        <label class="admin-form-label">原密码</label>
+        <input type="password" class="admin-form-input" id="oldAdminPwd" placeholder="">
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-form-label">新密码</label>
+        <input type="password" class="admin-form-input" id="newAdminPwd" placeholder="">
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-form-label">确认新密码</label>
+        <input type="password" class="admin-form-input" id="confirmNewAdminPwd" placeholder="">
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-cancel" id="cancelChangeAdminPwd">取消</button>
+        <button class="modal-btn modal-btn-confirm" id="confirmChangeAdminPwd">确认修改</button>
+      </div>
+    </div>
+  </div>
+  <!-- 门店密码重置弹窗 -->
+  <div class="modal" id="resetStorePwdModal">
+    <div class="modal-content">
+      <div class="modal-title" id="resetPwdTitle">重置门店账号密码</div>
+      <div class="admin-form-group">
+        <label class="admin-form-label">新密码</label>
+        <input type="password" class="admin-form-input" id="newStorePwd" placeholder="">
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-form-label">确认新密码</label>
+        <input type="password" class="admin-form-input" id="confirmNewStorePwd" placeholder="">
+      </div>
+      <input type="hidden" id="resetStoreUserId"> <!-- 存储待重置密码的门店ID -->
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-cancel" id="cancelResetStorePwd">取消</button>
+        <button class="modal-btn modal-btn-confirm" id="confirmResetStorePwd">确认重置</button>
+      </div>
+    </div>
+  </div>
+  <!-- 到期扫码付费弹窗 -->
+  <div class="modal" id="expirePayModal">
+    <div class="expire-pay-modal-content">
+      <div class="modal-title" style="color:#f5222d">账号已到期，请续费</div>
+      <div class="pay-tip">选择下方套餐，扫描二维码完成付费后点击确认</div>
+      <div class="pay-owner">付款对象：便利店管理</div>
+      <!-- 付费二维码 -->
+      <div class="qrcode-box" id="payQrcodeBox">
+        <img id="payQrcodeImg" src="" alt="收款二维码">
+      </div>
+      <!-- 套餐选择 -->
+      <div style="margin:15px 0; text-align:left; padding:0 10px;">
+        <label class="admin-form-label" style="margin-bottom:8px; font-size:14px;">选择续费套餐</label>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+          <label style="display: flex; align-items: center; padding: 10px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer;">
+            <input type="radio" name="expirePackage" value="30" style="margin-right: 8px;" checked> 
+            <span>包月套餐：30天（99元）</span>
+          </label>
+          <label style="display: flex; align-items: center; padding: 10px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer;">
+            <input type="radio" name="expirePackage" value="180" style="margin-right: 8px;"> 
+            <span>半年套餐：180天（499元）</span>
+          </label>
+          <label style="display: flex; align-items: center; padding: 10px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer;">
+            <input type="radio" name="expirePackage" value="365" style="margin-right: 8px;"> 
+            <span>年套餐：365天（799元）</span>
+          </label>
+        </div>
+      </div>
+      <button class="modal-btn modal-btn-confirm" id="confirmExpireBtn" style="width:95%; margin:0 auto 10px; display:block;">确认付费，提交续期申请</button>
+      <div class="contact-info" id="payContactInfo">
+        管理员联系方式：<br>
+        电话13800000000
+      </div>
+      <div class="modal-footer" style="margin-top: 25px;">
+        <button class="modal-btn modal-btn-confirm" id="gotoLoginBtn">返回登录页</button>
+      </div>
+    </div>
+  </div>
+  <!-- 管理员续费到账提醒弹窗 -->
+  <div class="modal" id="renewalNoticeModal">
+    <div class="renewal-notice-modal-content">
+      <div class="renewal-icon">✅</div>
+      <div class="renewal-title">门店续费到账提醒</div>
+      <div class="renewal-info" id="renewalNoticeInfo">
+        <!-- 续费信息 -->
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-confirm" id="closeRenewalNotice">确认</button>
+      </div>
+    </div>
+  </div>
+  <!-- 管理员审核续期申请弹窗 -->
+  <div class="modal" id="auditRenewalModal">
+    <div class="renewal-notice-modal-content">
+      <div class="renewal-icon">💰</div>
+      <div class="renewal-title">审核续期申请</div>
+      <div class="renewal-info" id="auditRenewalInfo">
+        <!-- 审核内容 -->
+      </div>
+      <input type="hidden" id="auditRenewalId">
+      <div class="modal-footer" style="display: flex; gap: 10px;">
+        <button class="modal-btn modal-btn-cancel" id="rejectRenewalBtn" style="background: #f5222d; color: white;">驳回</button>
+        <button class="modal-btn modal-btn-confirm" id="approveRenewalBtn">确认通过</button>
+      </div>
+    </div>
+  </div>
+  <!-- 相机扫描弹窗 -->
+  <div class="modal" id="scannerModal">
+    <div class="scanner-modal-content">
+      <div class="modal-title">相机扫描条码</div>
+      <div style="font-size: 12px; color: #666; margin-bottom: 10px; text-align: center;">
+        将条码对准摄像头，自动识别
+      </div>
+      <div id="reader"></div>
+      <div class="barcode-match-tip" id="scannerMatchTip" style="margin-top: 10px;"></div>
+      <button class="scanner-close-btn" id="closeScannerBtn">关闭相机</button>
+    </div>
+  </div>
+  <!-- Token设置弹窗 -->
   <div class="modal" id="tokenModal">
     <div class="modal-content">
       <div class="modal-title">GitHub Token 设置</div>
@@ -30,33 +454,37 @@
       </div>
     </div>
   </div>
-  
-  <!-- 原有引入库保持不变 -->
+  <!-- 提示框 -->
+  <div class="toast" id="toast"></div>
+  <div class="sync-tip" id="syncTip"></div>
+
+  <!-- 引入必要库 -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <!-- 引入条码扫描库 -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
-    // --------------- 仓库数据配置（修改）---------------
+    // --------------- 仓库数据配置（已填好你的仓库信息）---------------
     const REPO_CONFIG = {
       owner: 'MDJTL',
-      repo: '.github.io',
+      repo: '1.github.io',
       path: 'store_data.json',
       branch: 'main',
-      readUrl: 'https://raw.githubusercontent.com/MDJTL/.github.io/main/store_data.json',
-      apiUrl: 'https://api.github.com/repos/MDJTL/.github.io/contents/store_data.json'
+      readUrl: 'https://raw.githubusercontent.com/MDJTL/1.github.io/main/store_data.json',
+      apiUrl: 'https://api.github.com/repos/MDJTL/1.github.io/contents/store_data.json'
     };
 
-    // --------------- 系统配置（新增同步相关）---------------
+    // --------------- 系统配置（可修改这里的默认信息）---------------
     const SYSTEM_CONFIG = {
-      adminDefaultPwd: 'admin123',
-      defaultExpireDays: 30,
-      minPwdLength: 6,
-      expireWarnDays: 3,
-      defaultPayOwner: '便利店管理',
-      defaultContact: '电话13800000000',
-      syncDebounceTime: 1000, // 同步防抖时间
-      syncRetryTimes: 3,      // 同步失败重试次数
-      syncRetryDelay: 2000    // 重试延迟
+      adminDefaultPwd: 'admin123', // 默认管理员密码（登录后建议修改）
+      defaultExpireDays: 30,        // 新门店账号默认有效期（天）
+      minPwdLength: 6,              // 密码最小长度
+      expireWarnDays: 3,            // 到期提醒天数（提前3天提醒）
+      defaultPayOwner: '便利店管理', // 付款对象名称
+      defaultContact: '电话13800000000' // 管理员联系方式
     };
 
-    // --------------- 全局核心数据（新增同步配置）---------------
+    // --------------- 全局核心数据（从仓库同步）---------------
     let GLOBAL_DATA = {
       userList: [],
       payQrcode: '',
@@ -73,7 +501,7 @@
       }
     };
 
-    // --------------- 设备本地状态（新增同步相关）---------------
+    // --------------- 设备本地状态（各设备独立）---------------
     const LOCAL_STATE = {
       isLogin: false,
       currentUser: null,
@@ -84,35 +512,215 @@
       currentGoods: null,
       editUserId: null,
       resetStoreUserId: null,
-      syncLock: false, // 同步锁，防止并发
-      syncDebounceTimer: null // 防抖定时器
+      syncLock: false,
+      syncDebounceTimer: null
     };
 
-    // --------------- DOM元素（新增Token相关）---------------
+    // --------------- 相机扫描实例 ---------------
+    let html5QrCode = null;
+
+    // --------------- DOM元素 ---------------
     const el = {
-      // 原有元素保持不变...
-      
-      // 新增Token设置弹窗元素
+      // 登录页面
+      loginPage: document.getElementById('loginPage'),
+      loginUsername: document.getElementById('loginUsername'),
+      loginPassword: document.getElementById('loginPassword'),
+      loginBtn: document.getElementById('loginBtn'),
+      loginTip: document.getElementById('loginTip'),
+      // 主页面
+      mainPage: document.getElementById('mainPage'),
+      currentStoreName: document.getElementById('currentStoreName'),
+      expireInfo: document.getElementById('expireInfo'),
+      changeAdminPwdBtn: document.getElementById('changeAdminPwdBtn'),
+      logoutBtn: document.getElementById('logoutBtn'),
+      adminBtn: document.getElementById('adminBtn'),
+      uploadBtn: document.getElementById('uploadBtn'),
+      fileInput: document.getElementById('fileInput'),
+      fileInfo: document.getElementById('fileInfo'),
+      deleteBtn: document.getElementById('deleteBtn'),
+      checkCard: document.getElementById('checkCard'),
+      scanBox: document.getElementById('scanBox'),
+      barcodeInput: document.getElementById('barcodeInput'),
+      checkBtn: document.getElementById('checkBtn'),
+      progressTip: document.getElementById('progressTip'),
+      progressPercent: document.getElementById('progressPercent'),
+      progressFill: document.getElementById('progressFill'),
+      goodsCard: document.getElementById('goodsCard'),
+      goodsList: document.getElementById('goodsList'),
+      diffCard: document.getElementById('diffCard'),
+      diffList: document.getElementById('diffList'),
+      exportBtn: document.getElementById('exportBtn'),
+      emptyTip: document.getElementById('emptyTip'),
+      // 新增元素
+      dataSyncCard: document.getElementById('dataSyncCard'),
+      quickExportBtn: document.getElementById('quickExportBtn'),
+      cameraScanBtn: document.getElementById('cameraScanBtn'),
+      barcodeMatchTip: document.getElementById('barcodeMatchTip'),
+      // 弹窗相关
+      quantityModal: document.getElementById('quantityModal'),
+      quantityTitle: document.getElementById('quantityTitle'),
+      quantityInput: document.getElementById('quantityInput'),
+      cancelQuantity: document.getElementById('cancelQuantity'),
+      confirmQuantity: document.getElementById('confirmQuantity'),
+      diffModal: document.getElementById('diffModal'),
+      diffInfo: document.getElementById('diffInfo'),
+      closeDiff: document.getElementById('closeDiff'),
+      adminModal: document.getElementById('adminModal'),
+      adminAuth: document.getElementById('adminAuth'),
+      adminManage: document.getElementById('adminManage'),
+      adminPassword: document.getElementById('adminPassword'),
+      cancelAdminAuth: document.getElementById('cancelAdminAuth'),
+      confirmAdminAuth: document.getElementById('confirmAdminAuth'),
+      addUserBtn: document.getElementById('addUserBtn'),
+      exportDataBtn: document.getElementById('exportDataBtn'),
+      importDataBtn: document.getElementById('importDataBtn'),
+      userList: document.getElementById('userList'),
+      closeAdminModal: document.getElementById('closeAdminModal'),
+      renewalLogList: document.getElementById('renewalLogList'),
+      toggleRenewalLog: document.getElementById('toggleRenewalLog'),
+      toggleUseLog: document.getElementById('toggleUseLog'),
+      useLogList: document.getElementById('useLogList'),
+      qrcodePreview: document.getElementById('qrcodePreview'),
+      previewImg: document.getElementById('previewImg'),
+      noQrcodeTip: document.getElementById('noQrcodeTip'),
+      qrcodeFileInput: document.getElementById('qrcodeFileInput'),
+      uploadQrcodeBtn: document.getElementById('uploadQrcodeBtn'),
+      adminContactInput: document.getElementById('adminContactInput'),
+      saveContactBtn: document.getElementById('saveContactBtn'),
+      userModal: document.getElementById('userModal'),
+      userModalTitle: document.getElementById('userModalTitle'),
+      userUsername: document.getElementById('userUsername'),
+      userPassword: document.getElementById('userPassword'),
+      userExpireDate: document.getElementById('userExpireDate'),
+      cancelUser: document.getElementById('cancelUser'),
+      confirmUser: document.getElementById('confirmUser'),
+      changeAdminPwdModal: document.getElementById('changeAdminPwdModal'),
+      oldAdminPwd: document.getElementById('oldAdminPwd'),
+      newAdminPwd: document.getElementById('newAdminPwd'),
+      confirmNewAdminPwd: document.getElementById('confirmNewAdminPwd'),
+      cancelChangeAdminPwd: document.getElementById('cancelChangeAdminPwd'),
+      confirmChangeAdminPwd: document.getElementById('confirmChangeAdminPwd'),
+      resetStorePwdModal: document.getElementById('resetStorePwdModal'),
+      resetPwdTitle: document.getElementById('resetPwdTitle'),
+      newStorePwd: document.getElementById('newStorePwd'),
+      confirmNewStorePwd: document.getElementById('confirmNewStorePwd'),
+      resetStoreUserId: document.getElementById('resetStoreUserId'),
+      cancelResetStorePwd: document.getElementById('cancelResetStorePwd'),
+      confirmResetStorePwd: document.getElementById('confirmResetStorePwd'),
+      expirePayModal: document.getElementById('expirePayModal'),
+      payQrcodeImg: document.getElementById('payQrcodeImg'),
+      payContactInfo: document.getElementById('payContactInfo'),
+      gotoLoginBtn: document.getElementById('gotoLoginBtn'),
+      confirmExpireBtn: document.getElementById('confirmExpireBtn'),
+      renewalNoticeModal: document.getElementById('renewalNoticeModal'),
+      renewalNoticeInfo: document.getElementById('renewalNoticeInfo'),
+      closeRenewalNotice: document.getElementById('closeRenewalNotice'),
+      // 扫描弹窗
+      scannerModal: document.getElementById('scannerModal'),
+      reader: document.getElementById('reader'),
+      scannerMatchTip: document.getElementById('scannerMatchTip'),
+      closeScannerBtn: document.getElementById('closeScannerBtn'),
+      toast: document.getElementById('toast'),
+      syncTip: document.getElementById('syncTip'),
+      // 套餐选择相关
+      expirePackage: document.getElementsByName('expirePackage'),
+      // 审核续期弹窗
+      auditRenewalModal: document.getElementById('auditRenewalModal'),
+      auditRenewalInfo: document.getElementById('auditRenewalInfo'),
+      auditRenewalId: document.getElementById('auditRenewalId'),
+      approveRenewalBtn: document.getElementById('approveRenewalBtn'),
+      rejectRenewalBtn: document.getElementById('rejectRenewalBtn'),
+      // Token设置弹窗
       tokenModal: document.getElementById('tokenModal'),
       githubTokenInput: document.getElementById('githubTokenInput'),
       syncModeSelect: document.getElementById('syncModeSelect'),
       cancelTokenBtn: document.getElementById('cancelTokenBtn'),
       saveTokenBtn: document.getElementById('saveTokenBtn'),
-      // 新增同步按钮（在管理员弹窗中显示）
-      syncNowBtn: null,
-      tokenSettingBtn: null
+      syncNowBtn: document.getElementById('syncNowBtn'),
+      tokenSettingBtn: document.getElementById('tokenSettingBtn')
     };
 
-    // --------------- 新增安全工具函数 ---------------
-    // 加密存储Token（简单加密，防止本地明文泄露）
+    // --------------- 基础工具函数 ---------------
+    function showToast(text, time = 2000) {
+      el.toast.textContent = text;
+      el.toast.style.display = 'block';
+      setTimeout(() => el.toast.style.display = 'none', time);
+    }
+
+    function showSyncTip(text, time = 2000) {
+      el.syncTip.textContent = text;
+      el.syncTip.style.display = 'block';
+      setTimeout(() => el.syncTip.style.display = 'none', time);
+    }
+
+    function showLoginTip(text, isError = true) {
+      el.loginTip.textContent = text;
+      el.loginTip.style.color = isError ? '#f5222d' : '#00b42a';
+      el.loginTip.style.display = 'block';
+    }
+
+    function vibrate() {
+      if (navigator.vibrate) navigator.vibrate([300, 200, 300]);
+    }
+
+    function formatDate(date) {
+      return date.toISOString().split('T')[0];
+    }
+
+    function formatDateTime(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      const h = String(date.getHours()).padStart(2, '0');
+      const mm = String(date.getMinutes()).padStart(2, '0');
+      const s = String(date.getSeconds()).padStart(2, '0');
+      return `${y}-${m}-${d} ${h}:${mm}:${s}`;
+    }
+
+    function getDateDiff(startDate, endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      return Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    }
+
+    // 检查账号是否过期
+    function checkUserExpire(user) {
+      if (user.role === 'admin') return false;
+      const today = new Date();
+      const expireDate = new Date(user.expireDate);
+      return today > expireDate;
+    }
+
+    // 检查到期提醒
+    function checkExpireWarn(user) {
+      if (user.role === 'admin') return false;
+      const diffDays = getDateDiff(new Date(), new Date(user.expireDate));
+      return diffDays <= SYSTEM_CONFIG.expireWarnDays && diffDays >= 0;
+    }
+
+    // 记录使用日志
+    async function recordUseLog(action) {
+      if (!LOCAL_STATE.currentUser) return;
+      const logItem = {
+        user: LOCAL_STATE.currentUser.username,
+        action: action,
+        time: formatDateTime(new Date()),
+        device: navigator.userAgent.substring(0, 50)
+      };
+      GLOBAL_DATA.useLog.unshift(logItem);
+      // 只保留最近100条日志
+      if (GLOBAL_DATA.useLog.length > 100) GLOBAL_DATA.useLog.pop();
+      // 保存到本地
+      await saveToRepo();
+    }
+
+    // --------------- 安全工具函数 ---------------
     function encryptToken(token) {
       if (!token) return '';
-      // 使用简单的Base64 + 随机盐值加密
       const salt = 'store_' + new Date().getFullYear();
       return btoa(salt + token + salt);
     }
 
-    // 解密Token
     function decryptToken(encryptedToken) {
       if (!encryptedToken) return '';
       try {
@@ -124,7 +732,6 @@
       }
     }
 
-    // 从本地存储加载Token
     function loadTokenFromLocal() {
       try {
         const encryptedToken = localStorage.getItem('github_token_encrypted');
@@ -139,7 +746,6 @@
       }
     }
 
-    // 保存Token到本地存储
     function saveTokenToLocal(token, syncMode) {
       try {
         const encryptedToken = encryptToken(token);
@@ -154,8 +760,7 @@
       }
     }
 
-    // --------------- 新增GitHub API同步函数 ---------------
-    // 获取文件SHA（用于更新）
+    // --------------- GitHub API同步函数 ---------------
     async function getFileSha() {
       if (!GLOBAL_DATA.syncConfig.token) return '';
       try {
@@ -178,15 +783,12 @@
       }
     }
 
-    // 从GitHub拉取最新数据（实时同步）
     async function pullFromGitHub(retry = 0) {
       if (!GLOBAL_DATA.syncConfig.syncEnabled || LOCAL_STATE.syncLock) return false;
       
       LOCAL_STATE.syncLock = true;
       try {
         showSyncTip('🔄 正在拉取最新数据...');
-        
-        // 添加时间戳防止缓存
         const timestamp = new Date().getTime();
         const response = await fetch(`${REPO_CONFIG.readUrl}?t=${timestamp}`, {
           headers: {
@@ -197,13 +799,11 @@
         
         if (response.ok) {
           const data = await response.json();
-          // 深度拷贝
           GLOBAL_DATA = JSON.parse(JSON.stringify({
             ...data,
-            syncConfig: GLOBAL_DATA.syncConfig // 保留本地同步配置
+            syncConfig: GLOBAL_DATA.syncConfig
           }));
           
-          // 更新本地备份
           localStorage.setItem('store_data_backup', JSON.stringify(GLOBAL_DATA));
           sessionStorage.setItem('store_data_temp', JSON.stringify(GLOBAL_DATA));
           
@@ -212,7 +812,6 @@
           
           showSyncTip('✅ 数据同步成功', 2000);
           
-          // 更新UI
           if (LOCAL_STATE.currentUser && LOCAL_STATE.currentUser.role === 'admin') {
             renderUserList();
             renderRenewalLog();
@@ -221,17 +820,17 @@
           }
           
           return true;
-        } else if (retry < SYSTEM_CONFIG.syncRetryTimes) {
-          showSyncTip(`⚠️ 拉取失败，${SYSTEM_CONFIG.syncRetryDelay/1000}秒后重试（${retry+1}/${SYSTEM_CONFIG.syncRetryTimes}）`);
-          await new Promise(resolve => setTimeout(resolve, SYSTEM_CONFIG.syncRetryDelay));
+        } else if (retry < 3) {
+          showSyncTip(`⚠️ 拉取失败，2秒后重试（${retry+1}/3）`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
           return await pullFromGitHub(retry + 1);
         } else {
           showSyncTip('❌ 同步失败，使用本地数据', 3000);
           return false;
         }
       } catch (e) {
-        if (retry < SYSTEM_CONFIG.syncRetryTimes) {
-          await new Promise(resolve => setTimeout(resolve, SYSTEM_CONFIG.syncRetryDelay));
+        if (retry < 3) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
           return await pullFromGitHub(retry + 1);
         } else {
           console.error('拉取数据异常:', e);
@@ -243,18 +842,13 @@
       }
     }
 
-    // 推送数据到GitHub（实时同步）
     async function pushToGitHub(retry = 0) {
       if (!GLOBAL_DATA.syncConfig.syncEnabled || LOCAL_STATE.syncLock) return false;
       
       LOCAL_STATE.syncLock = true;
       try {
         showSyncTip('🔄 正在推送数据到GitHub...');
-        
-        // 获取文件SHA
         const sha = await getFileSha();
-        
-        // 准备推送数据
         const dataToPush = {
           ...GLOBAL_DATA,
           syncConfig: {
@@ -280,23 +874,22 @@
         });
         
         if (response.ok) {
-          // 更新本地同步时间
           localStorage.setItem('last_sync_time', dataToPush.syncConfig.lastSyncTime);
           showSyncTip('✅ 数据已同步到GitHub', 2000);
           return true;
-        } else if (retry < SYSTEM_CONFIG.syncRetryTimes) {
+        } else if (retry < 3) {
           const errorText = await response.text();
           console.error('推送失败:', response.status, errorText);
-          showSyncTip(`⚠️ 推送失败，${SYSTEM_CONFIG.syncRetryDelay/1000}秒后重试（${retry+1}/${SYSTEM_CONFIG.syncRetryTimes}）`);
-          await new Promise(resolve => setTimeout(resolve, SYSTEM_CONFIG.syncRetryDelay));
+          showSyncTip(`⚠️ 推送失败，2秒后重试（${retry+1}/3）`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
           return await pushToGitHub(retry + 1);
         } else {
           showSyncTip('❌ 推送失败，数据已保存到本地', 3000);
           return false;
         }
       } catch (e) {
-        if (retry < SYSTEM_CONFIG.syncRetryTimes) {
-          await new Promise(resolve => setTimeout(resolve, SYSTEM_CONFIG.syncRetryDelay));
+        if (retry < 3) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
           return await pushToGitHub(retry + 1);
         } else {
           console.error('推送数据异常:', e);
@@ -308,7 +901,6 @@
       }
     }
 
-    // 防抖同步函数
     function debounceSync(func, wait) {
       return function(...args) {
         clearTimeout(LOCAL_STATE.syncDebounceTimer);
@@ -318,15 +910,12 @@
       };
     }
 
-    // 自动同步函数（防抖版）
     const autoSync = debounceSync(async () => {
       if (GLOBAL_DATA.syncConfig.syncMode !== 'auto' || !GLOBAL_DATA.syncConfig.syncEnabled) return;
-      // 先拉取最新数据，再推送本地修改
       await pullFromGitHub();
       await pushToGitHub();
-    }, SYSTEM_CONFIG.syncDebounceTime);
+    }, 1000);
 
-    // 手动触发同步
     async function syncNow() {
       if (!GLOBAL_DATA.syncConfig.syncEnabled) {
         showToast('请先配置GitHub Token');
@@ -342,69 +931,41 @@
       }
     }
 
-    // 打开Token设置弹窗
     function openTokenSettingModal() {
       el.githubTokenInput.value = GLOBAL_DATA.syncConfig.token;
       el.syncModeSelect.value = GLOBAL_DATA.syncConfig.syncMode;
       el.tokenModal.style.display = 'flex';
     }
 
-    // 保存Token设置
     function saveTokenSetting() {
       const token = el.githubTokenInput.value.trim();
       const syncMode = el.syncModeSelect.value;
       saveTokenToLocal(token, syncMode);
       el.tokenModal.style.display = 'none';
-      // 立即测试同步
       if (token) {
         syncNow();
       }
     }
 
-    // --------------- 修改原有保存函数，增加自动同步 ---------------
-    async function saveToRepo() {
-      try {
-        showSyncTip('💾 正在保存数据到本地...');
-        // 原有本地保存逻辑
-        localStorage.setItem('store_data_backup', JSON.stringify(GLOBAL_DATA));
-        sessionStorage.setItem('store_data_temp', JSON.stringify(GLOBAL_DATA));
-        showSyncTip('✅ 数据保存成功（本地持久化）', 1500);
-        
-        // 新增：自动同步到GitHub
-        if (GLOBAL_DATA.syncConfig.syncEnabled && GLOBAL_DATA.syncConfig.syncMode === 'auto') {
-          autoSync();
-        }
-        
-        return true;
-      } catch (error) {
-        showToast('❌ 保存失败：' + error.message);
-        return false;
-      }
-    }
-
-    // --------------- 修改原有loadFromRepo函数，增加拉取 ---------------
+    // --------------- 数据同步函数 ---------------
     async function loadFromRepo() {
       try {
         showSyncTip('正在同步最新数据...');
-        
-        // 先加载本地Token
         loadTokenFromLocal();
         
-        // 尝试从GitHub拉取
         let pullSuccess = false;
         if (GLOBAL_DATA.syncConfig.syncEnabled) {
           pullSuccess = await pullFromGitHub();
         }
         
         if (!pullSuccess) {
-          // 备用：读取本地数据
           const localData = localStorage.getItem('store_data_backup');
           if (localData) {
             try {
               const parsedData = JSON.parse(localData);
               GLOBAL_DATA = {
                 ...parsedData,
-                syncConfig: GLOBAL_DATA.syncConfig // 保留同步配置
+                syncConfig: GLOBAL_DATA.syncConfig
               };
               showSyncTip('📱 使用本地最新数据', 2000);
             } catch (e) {
@@ -412,7 +973,6 @@
               initDefaultData();
             }
           } else {
-            // 初始化默认数据
             initDefaultData();
             await saveToRepo();
           }
@@ -421,12 +981,11 @@
         return true;
       } catch (error) {
         console.error('从GitHub同步失败，使用本地数据:', error);
-        // 备用方案
         const localData = localStorage.getItem('store_data_backup');
         if (localData) {
           try {
             GLOBAL_DATA = JSON.parse(localData);
-            loadTokenFromLocal(); // 重新加载Token配置
+            loadTokenFromLocal();
             showSyncTip('📱 使用本地最新数据', 2000);
           } catch (e) {
             initDefaultData();
@@ -439,92 +998,804 @@
       }
     }
 
-    // --------------- 修改管理员授权函数，添加同步按钮 ---------------
-    function adminAuth() {
-      const pwd = el.adminPassword.value.trim();
-      if (!pwd) { showToast('请输入管理员密码'); return; }
-      const admin = GLOBAL_DATA.userList.find(u => u.role === 'admin' && u.password === pwd);
-      if (!admin) { showToast('管理员密码错误'); return; }
-      el.adminAuth.style.display = 'none';
-      el.adminManage.style.display = 'block';
-      loadQrcodePreview();
-      renderUserList();
-      
-      // 新增：添加同步按钮
-      const buttonContainer = document.querySelector('#adminManage > div:first-child');
-      // 创建Token设置按钮
-      if (!el.tokenSettingBtn) {
-        el.tokenSettingBtn = document.createElement('button');
-        el.tokenSettingBtn.className = 'modal-btn modal-btn-confirm';
-        el.tokenSettingBtn.style = 'flex: none; width: auto; padding: 8px 15px; background:#1890ff; margin-left: 8px;';
-        el.tokenSettingBtn.textContent = '⚙️ Token设置';
-        el.tokenSettingBtn.addEventListener('click', openTokenSettingModal);
-        buttonContainer.appendChild(el.tokenSettingBtn);
-      }
-      
-      // 创建手动同步按钮
-      if (!el.syncNowBtn) {
-        el.syncNowBtn = document.createElement('button');
-        el.syncNowBtn.className = 'modal-btn modal-btn-confirm';
-        el.syncNowBtn.style = 'flex: none; width: auto; padding: 8px 15px; background:#52c41a; margin-left: 8px;';
-        el.syncNowBtn.textContent = '🔄 立即同步';
-        el.syncNowBtn.addEventListener('click', syncNow);
-        buttonContainer.appendChild(el.syncNowBtn);
-      }
-      
-      // 绑定日志展开/收起（原有逻辑）
-      el.toggleRenewalLog.addEventListener('click', () => {
-        if (el.renewalLogList.style.display === 'none') {
-          el.renewalLogList.style.display = 'block';
-          el.toggleRenewalLog.textContent = '收起';
-        } else {
-          el.renewalLogList.style.display = 'none';
-          el.toggleRenewalLog.textContent = '展开';
+    function initDefaultData() {
+      GLOBAL_DATA = {
+        userList: [
+          {
+            id: 'admin_1',
+            username: 'admin',
+            password: SYSTEM_CONFIG.adminDefaultPwd,
+            role: 'admin',
+            expireDate: formatDate(new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 10)),
+            status: 'enable'
+          }
+        ],
+        payQrcode: '',
+        payOwner: SYSTEM_CONFIG.defaultPayOwner,
+        contactInfo: SYSTEM_CONFIG.defaultContact,
+        renewalLog: [],
+        unreadRenewal: [],
+        useLog: [],
+        syncConfig: {
+          token: '',
+          syncMode: 'auto',
+          lastSyncTime: '',
+          syncEnabled: false
         }
-      });
-      el.toggleUseLog.addEventListener('click', () => {
-        if (el.useLogList.style.display === 'none') {
-          el.useLogList.style.display = 'block';
-          el.toggleUseLog.textContent = '收起';
-        } else {
-          el.useLogList.style.display = 'none';
-          el.toggleUseLog.textContent = '展开';
+      };
+    }
+
+    async function saveToRepo() {
+      try {
+        showSyncTip('💾 正在保存数据到本地...');
+        localStorage.setItem('store_data_backup', JSON.stringify(GLOBAL_DATA));
+        sessionStorage.setItem('store_data_temp', JSON.stringify(GLOBAL_DATA));
+        showSyncTip('✅ 数据保存成功（本地持久化）', 1500);
+        
+        if (GLOBAL_DATA.syncConfig.syncEnabled && GLOBAL_DATA.syncConfig.syncMode === 'auto') {
+          autoSync();
         }
+        
+        return true;
+      } catch (error) {
+        showToast('❌ 保存失败：' + error.message);
+        return false;
+      }
+    }
+
+    function exportData() {
+      const dataStr = JSON.stringify(GLOBAL_DATA, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      saveAs(dataBlob, 'store_data.json');
+      showToast('📤 数据导出成功，请上传到GitHub仓库');
+      recordUseLog('导出数据备份');
+    }
+
+    function importData(file) {
+      if (!file) {
+        showToast('请选择store_data.json文件');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const newData = JSON.parse(e.target.result);
+          GLOBAL_DATA = JSON.parse(JSON.stringify(newData));
+          await saveToRepo();
+          renderUserList();
+          renderRenewalLog();
+          renderUseLog();
+          loadQrcodePreview();
+          showToast('📥 数据导入成功（已持久化）');
+          recordUseLog('导入数据备份');
+        } catch (error) {
+          showToast('❌ 数据解析失败，请检查文件格式');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // --------------- 登录功能 ---------------
+    async function login() {
+      const username = el.loginUsername.value.trim();
+      const password = el.loginPassword.value.trim();
+      if (!username || !password) {
+        showLoginTip('用户名和密码不能为空');
+        return;
+      }
+      const user = GLOBAL_DATA.userList.find(u => u.username === username && u.password === password);
+      if (!user) {
+        showLoginTip('用户名或密码错误');
+        return;
+      }
+      if (user.status === 'disable') {
+        showLoginTip('账号已被管理员禁用，请联系管理员');
+        return;
+      }
+      if (checkUserExpire(user)) {
+        LOCAL_STATE.currentUser = user;
+        LOCAL_STATE.isLogin = true;
+        showMainPage();
+        setTimeout(() => {
+          showExpirePayModal();
+        }, 500);
+        return;
+      }
+      LOCAL_STATE.currentUser = user;
+      LOCAL_STATE.isLogin = true;
+      await recordUseLog('登录系统');
+      showMainPage();
+    }
+
+    function logout() {
+      if (confirm('确定退出？当前点货数据会保留')) {
+        recordUseLog('退出系统');
+        forceLogout();
+      }
+    }
+
+    function forceLogout() {
+      LOCAL_STATE.isLogin = false;
+      LOCAL_STATE.currentUser = null;
+      el.mainPage.style.display = 'none';
+      el.loginPage.style.display = 'block';
+      el.loginUsername.value = '';
+      el.loginPassword.value = '';
+      el.loginTip.style.display = 'none';
+      showToast('已退出登录');
+    }
+
+    function showMainPage() {
+      el.loginPage.style.display = 'none';
+      el.mainPage.style.display = 'block';
+      const isAdmin = LOCAL_STATE.currentUser.role === 'admin';
+      el.adminBtn.style.display = isAdmin ? 'block' : 'none';
+      el.changeAdminPwdBtn.style.display = isAdmin ? 'block' : 'none';
+      el.currentStoreName.textContent = `当前门店：${LOCAL_STATE.currentUser.username}`;
+      if (LOCAL_STATE.currentUser.role === 'admin') {
+        el.expireInfo.textContent = '管理员账号（永久有效）';
+        el.expireInfo.className = 'expire-info';
+        el.dataSyncCard.style.display = 'block';
+      } else {
+        const expireDate = new Date(LOCAL_STATE.currentUser.expireDate);
+        const diffDays = getDateDiff(new Date(), expireDate);
+        if (diffDays <= 0) {
+          el.expireInfo.textContent = '账号已到期，请续费';
+          el.expireInfo.className = 'expire-warning';
+        } else if (diffDays <= SYSTEM_CONFIG.expireWarnDays) {
+          el.expireInfo.textContent = `剩余${diffDays}天到期（请及时续费）`;
+          el.expireInfo.className = 'expire-warning';
+        } else {
+          el.expireInfo.textContent = `有效期至：${formatDate(expireDate)}`;
+          el.expireInfo.className = 'expire-info';
+        }
+        el.dataSyncCard.style.display = 'none';
+      }
+    }
+
+    // --------------- 点货核心功能 ---------------
+    function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const bstr = evt.target.result;
+          const wb = XLSX.read(bstr, { type: 'binary' });
+          const wsname = wb.SheetNames[0];
+          const ws = wb.Sheets[wsname];
+          const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+          parseExcelData(data, file.name);
+        } catch (err) {
+          showToast('❌ Excel解析失败，请检查格式');
+        }
+      };
+      reader.readAsBinaryString(file);
+    }
+
+    function parseExcelData(data, fileName) {
+      const goods = [];
+      for (let i = 1; i < data.length; i++) {
+        const row = data[i];
+        if (!row[0] || !row[1]) continue;
+        goods.push({
+          id: `g${i}`,
+          barcode: String(row[0]).trim(),
+          name: String(row[1]).trim(),
+          plan: Number(row[2]) || 0,
+          actual: null,
+          checked: false
+        });
+      }
+      if (goods.length === 0) {
+        showToast('❌ 未识别到有效商品数据');
+        return;
+      }
+      LOCAL_STATE.goods = goods;
+      LOCAL_STATE.total = goods.length;
+      LOCAL_STATE.checked = 0;
+      LOCAL_STATE.diffs = [];
+      el.fileInfo.textContent = `已加载：${fileName}（共${goods.length}个商品）`;
+      el.checkCard.style.display = 'block';
+      el.goodsCard.style.display = 'block';
+      el.diffCard.style.display = 'none';
+      el.emptyTip.style.display = 'none';
+      el.deleteBtn.style.display = 'block';
+      renderGoodsList();
+      updateProgress();
+      showToast('✅ 配送单加载成功');
+      recordUseLog(`加载配送单：${fileName}（${goods.length}个商品）`);
+    }
+
+    function renderGoodsList() {
+      el.goodsList.innerHTML = '';
+      LOCAL_STATE.goods.forEach(g => {
+        const item = document.createElement('div');
+        item.className = 'goods-item';
+        item.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong>${g.name}</strong>
+              <span>（条码：${g.barcode}）</span>
+            </div>
+            <div style="color:${g.checked ? '#00b42a' : '#666'};">
+              ${g.checked ? `计划：${g.plan} / 实到：${g.actual}` : '未核对'}
+            </div>
+          </div>
+        `;
+        el.goodsList.appendChild(item);
       });
     }
 
-    // --------------- 修改事件绑定，添加Token相关 ---------------
+    function updateProgress() {
+      const percent = LOCAL_STATE.total > 0 ? Math.round((LOCAL_STATE.checked / LOCAL_STATE.total) * 100) : 0;
+      el.progressTip.textContent = `已核对：${LOCAL_STATE.checked} / ${LOCAL_STATE.total}`;
+      el.progressPercent.textContent = `${percent}%`;
+      el.progressFill.style.width = `${percent}%`;
+    }
+
+    function checkBarcode(barcode) {
+      if (LOCAL_STATE.goods.length === 0) {
+        showToast('❌ 请先上传配送单');
+        return;
+      }
+      let found = null;
+      if (barcode.length === 4) {
+        found = LOCAL_STATE.goods.find(g => g.barcode.endsWith(barcode) && !g.checked);
+      } else {
+        found = LOCAL_STATE.goods.find(g => g.barcode === barcode && !g.checked);
+      }
+      if (!found) {
+        showToast('❌ 未找到对应商品或已核对');
+        vibrate();
+        return;
+      }
+      LOCAL_STATE.currentGoods = found;
+      el.quantityTitle.textContent = `核对：${found.name}`;
+      el.quantityInput.value = found.plan;
+      el.quantityModal.style.display = 'flex';
+    }
+
+    function confirmQuantity() {
+      const actual = Number(el.quantityInput.value);
+      if (isNaN(actual) || actual < 0) {
+        showToast('❌ 请输入有效数量');
+        return;
+      }
+      const goods = LOCAL_STATE.currentGoods;
+      goods.actual = actual;
+      goods.checked = true;
+      LOCAL_STATE.checked++;
+      if (actual !== goods.plan) {
+        LOCAL_STATE.diffs.push({
+          name: goods.name,
+          barcode: goods.barcode,
+          plan: goods.plan,
+          actual: actual,
+          diff: actual - goods.plan
+        });
+        showDiffModal(goods, actual);
+      }
+      el.quantityModal.style.display = 'none';
+      renderGoodsList();
+      updateProgress();
+      if (LOCAL_STATE.checked === LOCAL_STATE.total) {
+        el.diffCard.style.display = 'block';
+        renderDiffList();
+        showToast('✅ 全部商品核对完成！');
+        recordUseLog('完成全部商品核对');
+      } else {
+        showToast('✅ 核对成功');
+      }
+    }
+
+    function showDiffModal(goods, actual) {
+      el.diffInfo.innerHTML = `
+        <div><strong>${goods.name}</strong></div>
+        <div>计划数量：${goods.plan}</div>
+        <div>实到数量：${actual}</div>
+        <div style="color:#f5222d; margin-top:5px;">差异：${actual - goods.plan}</div>
+      `;
+      el.diffModal.style.display = 'flex';
+    }
+
+    function renderDiffList() {
+      el.diffList.innerHTML = '';
+      if (LOCAL_STATE.diffs.length === 0) {
+        el.diffList.innerHTML = '<div class="empty-tip">无差异，全部一致</div>';
+        return;
+      }
+      LOCAL_STATE.diffs.forEach(d => {
+        const item = document.createElement('div');
+        item.className = 'goods-item';
+        item.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong>${d.name}</strong>
+              <span>（条码：${d.barcode}）</span>
+            </div>
+            <div style="color:#f5222d;">
+              计划：${d.plan} / 实到：${d.actual}（差异：${d.diff}）
+            </div>
+          </div>
+        `;
+        el.diffList.appendChild(item);
+      });
+    }
+
+    function exportDiffReport() {
+      if (LOCAL_STATE.goods.length === 0) {
+        showToast('❌ 请先上传配送单并完成核对');
+        return;
+      }
+      const header = [['商品条码', '商品名称', '计划数量', '实到数量', '差异数量']];
+      const rows = LOCAL_STATE.goods.map(g => [
+        g.barcode,
+        g.name,
+        g.plan,
+        g.actual || 0,
+        g.checked ? (g.actual - g.plan) : '未核对'
+      ]);
+      const ws = XLSX.utils.aoa_to_sheet([...header, ...rows]);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, '差异报表');
+      XLSX.writeFile(wb, `点货差异报表_${formatDate(new Date())}.xlsx`);
+      showToast('✅ 差异报表导出成功');
+      recordUseLog('导出差异报表');
+    }
+
+    function deleteCurrentOrder() {
+      if (confirm('确定删除当前配送单？所有核对数据将清空')) {
+        LOCAL_STATE.goods = [];
+        LOCAL_STATE.total = 0;
+        LOCAL_STATE.checked = 0;
+        LOCAL_STATE.diffs = [];
+        el.fileInfo.textContent = '';
+        el.checkCard.style.display = 'none';
+        el.goodsCard.style.display = 'none';
+        el.diffCard.style.display = 'none';
+        el.emptyTip.style.display = 'block';
+        el.deleteBtn.style.display = 'none';
+        el.progressFill.style.width = '0%';
+        el.progressTip.textContent = '已核对：0 / 0';
+        el.progressPercent.textContent = '0%';
+        showToast('✅ 配送单已删除');
+        recordUseLog('删除当前配送单');
+      }
+    }
+
+    // --------------- 管理员功能 ---------------
+    function renderUserList() {
+      el.userList.innerHTML = '';
+      GLOBAL_DATA.userList.filter(u => u.role === 'store').forEach(user => {
+        const item = document.createElement('div');
+        item.className = 'user-item';
+        const expireDate = new Date(user.expireDate);
+        const diffDays = getDateDiff(new Date(), expireDate);
+        item.innerHTML = `
+          <div class="user-info">
+            <div><strong>${user.username}</strong></div>
+            <div class="user-expire">
+              ${diffDays <= 0 ? '已到期' : `剩余${diffDays}天到期`} | 
+              状态：${user.status === 'enable' ? '启用' : '禁用'}
+            </div>
+          </div>
+          <div>
+            <button class="edit-btn" onclick="editUser('${user.id}')">编辑</button>
+            <button class="reset-pwd-btn" onclick="resetStorePwd('${user.id}')">重置密码</button>
+            ${user.status === 'enable' 
+              ? `<button class="disable-btn" onclick="toggleUserStatus('${user.id}')">禁用</button>` 
+              : `<button class="enable-btn" onclick="toggleUserStatus('${user.id}')">启用</button>`
+            }
+          </div>
+        `;
+        el.userList.appendChild(item);
+      });
+    }
+
+    function addUser() {
+      LOCAL_STATE.editUserId = null;
+      el.userModalTitle.textContent = '新增门店账号';
+      el.userUsername.value = '';
+      el.userPassword.value = '';
+      const defaultExpire = new Date();
+      defaultExpire.setDate(defaultExpire.getDate() + SYSTEM_CONFIG.defaultExpireDays);
+      el.userExpireDate.value = formatDate(defaultExpire);
+      el.userModal.style.display = 'flex';
+    }
+
+    function editUser(id) {
+      const user = GLOBAL_DATA.userList.find(u => u.id === id);
+      if (!user) return;
+      LOCAL_STATE.editUserId = id;
+      el.userModalTitle.textContent = '编辑门店账号';
+      el.userUsername.value = user.username;
+      el.userPassword.value = user.password;
+      el.userExpireDate.value = user.expireDate;
+      el.userModal.style.display = 'flex';
+    }
+
+    function saveUser() {
+      const username = el.userUsername.value.trim();
+      const password = el.userPassword.value.trim();
+      const expireDate = el.userExpireDate.value;
+      if (!username || !password || !expireDate) {
+        showToast('❌ 请填写完整信息');
+        return;
+      }
+      if (password.length < SYSTEM_CONFIG.minPwdLength) {
+        showToast(`❌ 密码长度至少${SYSTEM_CONFIG.minPwdLength}位`);
+        return;
+      }
+      if (LOCAL_STATE.editUserId) {
+        const user = GLOBAL_DATA.userList.find(u => u.id === LOCAL_STATE.editUserId);
+        user.username = username;
+        user.password = password;
+        user.expireDate = expireDate;
+        showToast('✅ 门店账号编辑成功');
+        recordUseLog(`编辑门店账号：${username}`);
+      } else {
+        const newUser = {
+          id: `store_${Date.now()}`,
+          username,
+          password,
+          role: 'store',
+          expireDate,
+          status: 'enable'
+        };
+        GLOBAL_DATA.userList.push(newUser);
+        showToast('✅ 门店账号新增成功');
+        recordUseLog(`新增门店账号：${username}`);
+      }
+      el.userModal.style.display = 'none';
+      renderUserList();
+      saveToRepo();
+    }
+
+    function toggleUserStatus(id) {
+      const user = GLOBAL_DATA.userList.find(u => u.id === id);
+      if (!user) return;
+      user.status = user.status === 'enable' ? 'disable' : 'enable';
+      renderUserList();
+      saveToRepo();
+      showToast(`✅ 门店账号${user.status === 'enable' ? '启用' : '禁用'}成功`);
+      recordUseLog(`${user.status === 'enable' ? '启用' : '禁用'}门店账号：${user.username}`);
+    }
+
+    function resetStorePwd(id) {
+      const user = GLOBAL_DATA.userList.find(u => u.id === id);
+      if (!user) return;
+      LOCAL_STATE.resetStoreUserId = id;
+      el.resetPwdTitle.textContent = `重置门店账号【${user.username}】密码`;
+      el.newStorePwd.value = '';
+      el.confirmNewStorePwd.value = '';
+      el.resetStorePwdModal.style.display = 'flex';
+    }
+
+    function confirmResetStorePwd() {
+      const newPwd = el.newStorePwd.value.trim();
+      const confirmPwd = el.confirmNewStorePwd.value.trim();
+      if (!newPwd || !confirmPwd) {
+        showToast('❌ 请填写新密码和确认密码');
+        return;
+      }
+      if (newPwd !== confirmPwd) {
+        showToast('❌ 两次输入的密码不一致');
+        return;
+      }
+      if (newPwd.length < SYSTEM_CONFIG.minPwdLength) {
+        showToast(`❌ 密码长度至少${SYSTEM_CONFIG.minPwdLength}位`);
+        return;
+      }
+      const user = GLOBAL_DATA.userList.find(u => u.id === LOCAL_STATE.resetStoreUserId);
+      user.password = newPwd;
+      el.resetStorePwdModal.style.display = 'none';
+      saveToRepo();
+      showToast('✅ 门店账号密码重置成功');
+      recordUseLog(`重置门店账号密码：${user.username}`);
+    }
+
+    function changeAdminPwd() {
+      el.oldAdminPwd.value = '';
+      el.newAdminPwd.value = '';
+      el.confirmNewAdminPwd.value = '';
+      el.changeAdminPwdModal.style.display = 'flex';
+    }
+
+    function confirmChangeAdminPwd() {
+      const oldPwd = el.oldAdminPwd.value.trim();
+      const newPwd = el.newAdminPwd.value.trim();
+      const confirmPwd = el.confirmNewAdminPwd.value.trim();
+      const admin = GLOBAL_DATA.userList.find(u => u.role === 'admin');
+      if (admin.password !== oldPwd) {
+        showToast('❌ 原密码错误');
+        return;
+      }
+      if (!newPwd || !confirmPwd) {
+        showToast('❌ 请填写新密码和确认密码');
+        return;
+      }
+      if (newPwd !== confirmPwd) {
+        showToast('❌ 两次输入的密码不一致');
+        return;
+      }
+      if (newPwd.length < SYSTEM_CONFIG.minPwdLength) {
+        showToast(`❌ 密码长度至少${SYSTEM_CONFIG.minPwdLength}位`);
+        return;
+      }
+      admin.password = newPwd;
+      el.changeAdminPwdModal.style.display = 'none';
+      saveToRepo();
+      showToast('✅ 管理员密码修改成功');
+      recordUseLog('修改管理员密码');
+    }
+
+    function loadQrcodePreview() {
+      if (GLOBAL_DATA.payQrcode) {
+        el.previewImg.src = GLOBAL_DATA.payQrcode;
+        el.previewImg.style.display = 'block';
+        el.noQrcodeTip.style.display = 'none';
+        el.payQrcodeImg.src = GLOBAL_DATA.payQrcode;
+      } else {
+        el.previewImg.style.display = 'none';
+        el.noQrcodeTip.style.display = 'block';
+        el.payQrcodeImg.src = '';
+      }
+      el.adminContactInput.value = GLOBAL_DATA.contactInfo;
+      el.payContactInfo.innerHTML = `管理员联系方式：<br>${GLOBAL_DATA.contactInfo}`;
+    }
+
+    function uploadQrcode(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        GLOBAL_DATA.payQrcode = e.target.result;
+        loadQrcodePreview();
+        saveToRepo();
+        showToast('✅ 收款码上传成功');
+        recordUseLog('上传收款二维码');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function saveContactInfo() {
+      GLOBAL_DATA.contactInfo = el.adminContactInput.value.trim() || SYSTEM_CONFIG.defaultContact;
+      el.payContactInfo.innerHTML = `管理员联系方式：<br>${GLOBAL_DATA.contactInfo}`;
+      saveToRepo();
+      showToast('✅ 联系方式保存成功');
+      recordUseLog('修改管理员联系方式');
+    }
+
+    function renderRenewalLog() {
+      if (GLOBAL_DATA.renewalLog.length === 0) {
+        el.renewalLogList.innerHTML = '暂无续期记录';
+        return;
+      }
+      el.renewalLogList.innerHTML = GLOBAL_DATA.renewalLog.map(log => `
+        <div class="log-item">
+          ${log.time} | ${log.storeName} | 续费${log.days}天 | ${log.status === 'pending' ? '待审核' : log.status === 'approved' ? '已通过' : '已驳回'}
+        </div>
+      `).join('');
+    }
+
+    function renderUseLog() {
+      if (GLOBAL_DATA.useLog.length === 0) {
+        el.useLogList.innerHTML = '暂无门店使用记录';
+        return;
+      }
+      el.useLogList.innerHTML = GLOBAL_DATA.useLog.slice(0, 50).map(log => `
+        <div class="use-log-item">
+          <div>${log.time} | ${log.user} | ${log.action}</div>
+          <div class="use-log-time">设备：${log.device}</div>
+        </div>
+      `).join('');
+    }
+
+    function toggleRenewalLog() {
+      const isExpanded = el.toggleRenewalLog.textContent === '展开';
+      el.renewalLogList.style.display = isExpanded ? 'block' : 'none';
+      el.toggleRenewalLog.textContent = isExpanded ? '收起' : '展开';
+    }
+
+    function toggleUseLog() {
+      const isExpanded = el.toggleUseLog.textContent === '展开';
+      el.useLogList.style.display = isExpanded ? 'block' : 'none';
+      el.toggleUseLog.textContent = isExpanded ? '收起' : '展开';
+    }
+
+    // --------------- 续费功能 ---------------
+    function showExpirePayModal() {
+      el.expirePayModal.style.display = 'flex';
+    }
+
+    function submitExpirePay() {
+      const selectedPackage = Array.from(el.expirePackage).find(r => r.checked).value;
+      const days = Number(selectedPackage);
+      const renewalId = `renewal_${Date.now()}`;
+      const renewalLog = {
+        id: renewalId,
+        storeName: LOCAL_STATE.currentUser.username,
+        storeId: LOCAL_STATE.currentUser.id,
+        days: days,
+        amount: days === 30 ? 99 : days === 180 ? 499 : 799,
+        time: formatDateTime(new Date()),
+        status: 'pending'
+      };
+      GLOBAL_DATA.renewalLog.unshift(renewalLog);
+      GLOBAL_DATA.unreadRenewal.push(renewalId);
+      saveToRepo();
+      el.expirePayModal.style.display = 'none';
+      showToast('✅ 续期申请已提交，请等待管理员审核');
+      recordUseLog(`提交续期申请：${days}天`);
+    }
+
+    function checkUnreadRenewal() {
+      if (LOCAL_STATE.currentUser && LOCAL_STATE.currentUser.role === 'admin' && GLOBAL_DATA.unreadRenewal.length > 0) {
+        const unreadCount = GLOBAL_DATA.unreadRenewal.length;
+        showToast(`🔔 有${unreadCount}条待审核的续期申请`);
+      }
+    }
+
+    function auditRenewal(renewalId, status) {
+      const renewal = GLOBAL_DATA.renewalLog.find(r => r.id === renewalId);
+      if (!renewal) return;
+      renewal.status = status;
+      if (status === 'approved') {
+        const store = GLOBAL_DATA.userList.find(u => u.id === renewal.storeId);
+        const oldExpire = new Date(store.expireDate);
+        const newExpire = new Date(oldExpire);
+        newExpire.setDate(newExpire.getDate() + renewal.days);
+        store.expireDate = formatDate(newExpire);
+        showToast(`✅ 门店【${renewal.storeName}】续期${renewal.days}天成功`);
+        recordUseLog(`通过门店续期：${renewal.storeName}（${renewal.days}天）`);
+      } else {
+        showToast(`✅ 已驳回门店【${renewal.storeName}】的续期申请`);
+        recordUseLog(`驳回门店续期：${renewal.storeName}`);
+      }
+      GLOBAL_DATA.unreadRenewal = GLOBAL_DATA.unreadRenewal.filter(id => id !== renewalId);
+      saveToRepo();
+      renderRenewalLog();
+      el.auditRenewalModal.style.display = 'none';
+    }
+
+    // --------------- 相机扫描功能 ---------------
+    async function startCameraScan() {
+      el.scannerModal.style.display = 'flex';
+      html5QrCode = new Html5Qrcode("reader");
+      try {
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 }
+          },
+          (decodedText) => {
+            el.scannerMatchTip.textContent = `识别到条码：${decodedText}`;
+            el.scannerMatchTip.style.display = 'block';
+            el.scannerMatchTip.className = 'barcode-match-tip barcode-match-success';
+            setTimeout(() => {
+              checkBarcode(decodedText);
+              stopCameraScan();
+            }, 1000);
+          },
+          (errorMessage) => {
+            console.log(errorMessage);
+          }
+        );
+      } catch (err) {
+        showToast('❌ 相机启动失败，请检查权限');
+        console.error(err);
+      }
+    }
+
+    function stopCameraScan() {
+      if (html5QrCode) {
+        html5QrCode.stop().then(() => {
+          html5QrCode.clear();
+          el.scannerModal.style.display = 'none';
+          el.scannerMatchTip.style.display = 'none';
+        }).catch(err => console.error(err));
+      }
+    }
+
+    // --------------- 事件绑定 ---------------
     function bindEvents() {
-      // 原有事件绑定保持不变...
-      
-      // 新增Token设置弹窗事件
+      // 登录
+      el.loginBtn.addEventListener('click', login);
+      el.loginPassword.addEventListener('keypress', (e) => e.key === 'Enter' && login());
+      el.logoutBtn.addEventListener('click', logout);
+      el.changeAdminPwdBtn.addEventListener('click', changeAdminPwd);
+      el.confirmChangeAdminPwd.addEventListener('click', confirmChangeAdminPwd);
+      el.cancelChangeAdminPwd.addEventListener('click', () => el.changeAdminPwdModal.style.display = 'none');
+      // 上传
+      el.uploadBtn.addEventListener('click', () => el.fileInput.click());
+      el.fileInput.addEventListener('change', handleFileUpload);
+      el.deleteBtn.addEventListener('click', deleteCurrentOrder);
+      // 点货
+      el.scanBox.addEventListener('click', () => el.barcodeInput.focus());
+      el.cameraScanBtn.addEventListener('click', startCameraScan);
+      el.closeScannerBtn.addEventListener('click', stopCameraScan);
+      el.barcodeInput.addEventListener('keypress', (e) => e.key === 'Enter' && checkBarcode(el.barcodeInput.value));
+      el.checkBtn.addEventListener('click', () => checkBarcode(el.barcodeInput.value));
+      el.confirmQuantity.addEventListener('click', confirmQuantity);
+      el.cancelQuantity.addEventListener('click', () => el.quantityModal.style.display = 'none');
+      el.closeDiff.addEventListener('click', () => el.diffModal.style.display = 'none');
+      el.exportBtn.addEventListener('click', exportDiffReport);
+      // 管理员
+      el.confirmAdminAuth.addEventListener('click', () => {
+        const pwd = el.adminPassword.value;
+        const admin = GLOBAL_DATA.userList.find(u => u.role === 'admin');
+        if (admin.password === pwd) {
+          el.adminAuth.style.display = 'none';
+          el.adminManage.style.display = 'block';
+          renderUserList();
+          renderRenewalLog();
+          renderUseLog();
+          loadQrcodePreview();
+          checkUnreadRenewal();
+        } else {
+          showToast('❌ 管理员密码错误');
+        }
+      });
+      el.cancelAdminAuth.addEventListener('click', () => el.adminModal.style.display = 'none');
+      el.closeAdminModal.addEventListener('click', () => {
+        el.adminModal.style.display = 'none';
+        el.adminAuth.style.display = 'block';
+        el.adminManage.style.display = 'none';
+        el.adminPassword.value = '';
+      });
+      el.addUserBtn.addEventListener('click', addUser);
+      el.confirmUser.addEventListener('click', saveUser);
+      el.cancelUser.addEventListener('click', () => el.userModal.style.display = 'none');
+      el.confirmResetStorePwd.addEventListener('click', confirmResetStorePwd);
+      el.cancelResetStorePwd.addEventListener('click', () => el.resetStorePwdModal.style.display = 'none');
+      el.uploadQrcodeBtn.addEventListener('click', () => el.qrcodeFileInput.click());
+      el.qrcodeFileInput.addEventListener('change', (e) => uploadQrcode(e.target.files[0]));
+      el.saveContactBtn.addEventListener('click', saveContactInfo);
+      el.toggleRenewalLog.addEventListener('click', toggleRenewalLog);
+      el.toggleUseLog.addEventListener('click', toggleUseLog);
+      el.exportDataBtn.addEventListener('click', exportData);
+      el.importDataBtn.addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = (e) => importData(e.target.files[0]);
+        input.click();
+      });
+      el.quickExportBtn.addEventListener('click', exportData);
+      // 续费
+      el.confirmExpireBtn.addEventListener('click', submitExpirePay);
+      el.gotoLoginBtn.addEventListener('click', () => {
+        el.expirePayModal.style.display = 'none';
+        forceLogout();
+      });
+      el.closeRenewalNotice.addEventListener('click', () => el.renewalNoticeModal.style.display = 'none');
+      el.approveRenewalBtn.addEventListener('click', () => auditRenewal(el.auditRenewalId.value, 'approved'));
+      el.rejectRenewalBtn.addEventListener('click', () => auditRenewal(el.auditRenewalId.value, 'rejected'));
+      // Token设置
       el.cancelTokenBtn.addEventListener('click', () => el.tokenModal.style.display = 'none');
       el.saveTokenBtn.addEventListener('click', saveTokenSetting);
-      
-      // 页面加载时自动同步
+      el.tokenSettingBtn.addEventListener('click', openTokenSettingModal);
+      el.syncNowBtn.addEventListener('click', syncNow);
+      // 页面加载
       window.addEventListener('load', async () => {
         await loadFromRepo();
-        // 每5分钟自动拉取一次（防止长时间未操作导致数据不一致）
         setInterval(() => {
           if (GLOBAL_DATA.syncConfig.syncEnabled && LOCAL_STATE.isLogin) {
             pullFromGitHub();
           }
         }, 5 * 60 * 1000);
       });
-      
-      // 窗口聚焦时同步
       window.addEventListener('focus', async () => {
         if (GLOBAL_DATA.syncConfig.syncEnabled && LOCAL_STATE.isLogin) {
-          pullFromGitHub();
+          await pullFromGitHub();
         }
       });
     }
 
-    // --------------- 原有函数保持不变 ---------------
-    // ... 所有原有函数都保留 ...
-
-    // 初始化
+    // --------------- 初始化 ---------------
     bindEvents();
   </script>
 </body>
 </html>
+
