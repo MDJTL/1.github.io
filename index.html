@@ -968,13 +968,12 @@ async function login() {
     return;
   }
   
-  // 🔴 新增：登录时强制清理本地旧缓存 + 同步GitHub最新数据
+  // 🔴 登录时强制清理本地旧缓存 + 同步GitHub最新数据
   localStorage.removeItem("store_data_backup"); // 删除本地旧数据备份
   sessionStorage.clear();                       // 清空临时缓存
   await loadFromRepo();                         // 强制从GitHub拉最新数据
   
-  // 🔴 原有逻辑完全保留（一行没改）
-  // 查找账号
+  // 🔴 原有逻辑完全保留
   const user = GLOBAL_DATA.userList.find(u => u.username === username && u.password === password);
   if (!user) {
     showLoginTip('用户名或密码错误');
@@ -996,18 +995,13 @@ async function login() {
     }, 500);
     return;
   }
-  // 登录成功
+  
+  // 🔴 登录成功：直接进入主页面，不再刷新
   LOCAL_STATE.currentUser = user;
   LOCAL_STATE.isLogin = true;
-  
-  // 🔴 新增：登录成功后自动刷新一次，确保数据100%最新
-  showToast("✅ 已同步云端最新数据");
-  setTimeout(() => {
-    window.location.reload(true); // true = 强制刷新，忽略浏览器缓存
-  }, 600);
-  
   await recordUseLog('登录系统');
-  showMainPage();
+  showToast("✅ 已同步云端最新数据");
+  showMainPage(); // 此时已经是 GitHub 最新数据，无需刷新
 }
 
 function logout() {
