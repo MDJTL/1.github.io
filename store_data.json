@@ -5,269 +5,37 @@
       "username": "admin",
       "password": "admin123",
       "role": "admin",
-      "expireDate": "2036-03-09",
+      "expireDate": "2036-03-11",
       "status": "enable"
-    },
-    {
-      "username": "A00189",
-      "password": "123456",
-      "expireDate": "2026-03-11",
-      "role": "user",
-      "status": "enable",
-      "id": "user_1773308597690"
     },
     {
       "username": "A00188",
       "password": "123456",
-      "expireDate": "2026-04-11",
+      "expireDate": "2026-04-13",
       "role": "user",
       "status": "enable",
-      "id": "user_1773383928675"
+      "id": "user_1773469439956"
     },
     {
-      "username": "A00190",
+      "username": "A00189",
       "password": "123456",
       "expireDate": "2026-03-12",
       "role": "user",
       "status": "enable",
-      "id": "user_1773383951363"
-    },
-    {
-      "username": "A00200",
-      "password": "123456",
-      "expireDate": "2026-03-13",
-      "role": "user",
-      "status": "enable",
-      "id": "user_1773466521178"
+      "id": "user_1773469454675"
     }
   ],
   "payQrcode": "",
   "payOwner": "便利店管理",
   "contactInfo": "电话13800000000",
-  "renewalLog": [
-    {
-      "username": "A00190",
-      "addDays": 30,
-      "auditTime": "2026-03-14 13:33:52",
-      "remark": "审核驳回",
-      "status": "rejected"
-    },
-    {
-      "username": "A00189",
-      "addDays": 30,
-      "auditTime": "2026-03-13 14:40:26",
-      "remark": "审核驳回",
-      "status": "rejected"
-    },
-    {
-      "addDays": 30,
-      "auditTime": "2026-03-13 14:38:12",
-      "remark": "审核驳回",
-      "status": "rejected"
-    },
-    {
-      "id": "renewal_1773308798090",
-      "storeId": "user_1773308597690",
-      "storeName": "A00189",
-      "addDays": 30,
-      "applyTime": "2026-03-12 17:46:38",
-      "status": "待审核"
-    },
-    {
-      "id": "renewal_1773308697842",
-      "storeId": "user_1773308597690",
-      "storeName": "A00189",
-      "addDays": 30,
-      "applyTime": "2026-03-12 17:44:57",
-      "status": "已驳回",
-      "auditTime": "2026-03-12 17:45:53"
-    },
-    {
-      "id": "renewal_1773308627026",
-      "storeId": "user_1773308597690",
-      "storeName": "A00189",
-      "addDays": 30,
-      "applyTime": "2026-03-12 17:43:47",
-      "status": "已驳回",
-      "auditTime": "2026-03-12 17:44:09"
-    }
-  ],
+  "renewalLog": [],
   "unreadRenewal": [],
   "useLog": [
     {
       "user": "admin",
       "action": "登录系统",
-      "time": "2026-03-14 14:01:51",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "退出系统",
-      "time": "2026-03-14 13:36:09",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "核对商品：瑞丽江欢乐家庭装芒果茶1.5L（配送6，实到1）",
-      "time": "2026-03-14 13:35:55",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "上传配送单：配送收货单-明细数据111.xls（131个商品）",
-      "time": "2026-03-14 13:35:45",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "登录系统",
-      "time": "2026-03-14 13:33:48",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "退出系统",
-      "time": "2026-03-13 14:52:54",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "删除当前配送单",
-      "time": "2026-03-13 14:40:35",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "登录系统",
-      "time": "2026-03-13 14:40:23",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "A00188",
-      "action": "退出系统",
-      "time": "2026-03-13 14:40:10",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "A00188",
-      "action": "核对商品：白猫柠檬红茶洗洁精500g（配送3，实到1）",
-      "time": "2026-03-13 14:40:01",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "A00188",
-      "action": "上传配送单：配送收货单-明细数据.xls（87个商品）",
-      "time": "2026-03-13 14:39:53",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "A00188",
-      "action": "登录系统",
-      "time": "2026-03-13 14:39:47",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "退出系统",
-      "time": "2026-03-13 14:39:26",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "登录系统",
-      "time": "2026-03-13 14:38:06",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "退出系统",
-      "time": "2026-03-12 17:46:17",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "上传配送单：配送收货单-明细数据.xls（0个商品）",
-      "time": "2026-03-12 17:46:05",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "删除当前配送单",
-      "time": "2026-03-12 17:46:00",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "登录系统",
-      "time": "2026-03-12 17:45:42",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "A00189",
-      "action": "退出系统",
-      "time": "2026-03-12 17:45:26",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "A00189",
-      "action": "上传配送单：配送收货单-明细数据111.xls（0个商品）",
-      "time": "2026-03-12 17:45:19",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "A00189",
-      "action": "删除当前配送单",
-      "time": "2026-03-12 17:45:15",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "A00189",
-      "action": "上传配送单：配送收货单-明细数据.xls（0个商品）",
-      "time": "2026-03-12 17:45:08",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "退出系统",
-      "time": "2026-03-12 17:44:45",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "登录系统",
-      "time": "2026-03-12 17:44:30",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "退出系统",
-      "time": "2026-03-12 17:44:12",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "登录系统",
-      "time": "2026-03-12 17:44:06",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "A00189",
-      "action": "退出系统",
-      "time": "2026-03-12 17:43:57",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "退出系统",
-      "time": "2026-03-12 17:43:29",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
-    },
-    {
-      "user": "admin",
-      "action": "登录系统",
-      "time": "2026-03-12 17:42:45",
+      "time": "2026-03-14 14:21:20",
       "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb"
     }
-  ],
-  "lastUpdateTime": 1773308798090
+  ]
 }
