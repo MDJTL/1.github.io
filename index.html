@@ -960,48 +960,62 @@
     }
 
     // --------------- 原有功能函数保持不变 ---------------
-    async function login() {
-      const username = el.loginUsername.value.trim();
-      const password = el.loginPassword.value.trim();
-      if (!username || !password) {
-        showLoginTip('用户名和密码不能为空');
-        return;
-      }
-      // 查找账号
-      const user = GLOBAL_DATA.userList.find(u => u.username === username && u.password === password);
-      if (!user) {
-        showLoginTip('用户名或密码错误');
-        return;
-      }
-      if (user.status === 'disable') {
-        showLoginTip('账号已被管理员禁用，请联系管理员');
-        return;
-      }
-      if (checkUserExpire(user)) {
-  // 先完成登录状态赋值
+async function login() {
+  const username = el.loginUsername.value.trim();
+  const password = el.loginPassword.value.trim();
+  if (!username || !password) {
+    showLoginTip('用户名和密码不能为空');
+    return;
+  }
+  
+  // 🔴 新增：登录时强制清理本地旧缓存 + 同步GitHub最新数据
+  localStorage.removeItem("store_data_backup"); // 删除本地旧数据备份
+  sessionStorage.clear();                       // 清空临时缓存
+  await loadFromRepo();                         // 强制从GitHub拉最新数据
+  
+  // 🔴 原有逻辑完全保留（一行没改）
+  // 查找账号
+  const user = GLOBAL_DATA.userList.find(u => u.username === username && u.password === password);
+  if (!user) {
+    showLoginTip('用户名或密码错误');
+    return;
+  }
+  if (user.status === 'disable') {
+    showLoginTip('账号已被管理员禁用，请联系管理员');
+    return;
+  }
+  if (checkUserExpire(user)) {
+    // 先完成登录状态赋值
+    LOCAL_STATE.currentUser = user;
+    LOCAL_STATE.isLogin = true;
+    // 再显示主页面（让系统拿到用户）
+    showMainPage();
+    // 最后弹出续费窗口
+    setTimeout(() => {
+      showExpirePayModal();
+    }, 500);
+    return;
+  }
+  // 登录成功
   LOCAL_STATE.currentUser = user;
   LOCAL_STATE.isLogin = true;
-  // 再显示主页面（让系统拿到用户）
-  showMainPage();
-  // 最后弹出续费窗口
+  
+  // 🔴 新增：登录成功后自动刷新一次，确保数据100%最新
+  showToast("✅ 已同步云端最新数据");
   setTimeout(() => {
-    showExpirePayModal();
-  }, 500);
-  return;
+    window.location.reload(true); // true = 强制刷新，忽略浏览器缓存
+  }, 600);
+  
+  await recordUseLog('登录系统');
+  showMainPage();
 }
-      // 登录成功
-      LOCAL_STATE.currentUser = user;
-      LOCAL_STATE.isLogin = true;
-      await recordUseLog('登录系统');
-      showMainPage();
-    }
 
-    function logout() {
-      if (confirm('确定退出？当前点货数据会保留')) {
-        recordUseLog('退出系统');
-        forceLogout();
-      }
-    }
+function logout() {
+  if (confirm('确定退出？当前点货数据会保留')) {
+    recordUseLog('退出系统');
+    forceLogout();
+  }
+}
 
     function forceLogout() {
       LOCAL_STATE.isLogin = false;
