@@ -64,11 +64,12 @@
     .user-item { padding: 10px; border: 1px solid #eee; border-radius: 4px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
     .user-info { font-size: 14px; }
     .user-expire { color: #666; font-size: 12px; margin-top: 3px; }
-    .edit-btn, .reset-pwd-btn, .disable-btn, .enable-btn { padding: 4px 8px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; margin-right: 5px; }
+    .edit-btn, .reset-pwd-btn, .disable-btn, .enable-btn, .delete-btn { padding: 4px 8px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; margin-right: 5px; }
     .edit-btn { background: #1989fa; color: white; }
     .reset-pwd-btn { background: #ff7a45; color: white; }
     .disable-btn { background: #f5222d; color: white; }
     .enable-btn { background: #00b42a; color: white; }
+    .delete-btn { background: #8c0000; color: white; }
     /* 收款码设置样式 */
     .qrcode-setting { border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px; }
     .qrcode-preview { width: 120px; height: 120px; border: 1px solid #eee; margin: 10px auto; display: flex; justify-content: center; align-items: center; }
@@ -135,6 +136,24 @@
       color: #999;
       margin-top: 5px;
       line-height: 1.4;
+    }
+    /* 新增门店列表收起展开样式 */
+    .user-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
+    }
+    .user-list-toggle {
+      font-size: 12px;
+      color: #1989fa;
+      cursor: pointer;
+      padding: 2px 8px;
+      border: 1px solid #1989fa;
+      border-radius: 4px;
     }
   </style>
 </head>
@@ -278,6 +297,11 @@
           <button class="modal-btn modal-btn-confirm" id="addUserBtn" style="flex: none; width: auto; padding: 8px 15px;">新增门店账号</button>
           <button class="modal-btn modal-btn-confirm" id="exportDataBtn" style="flex: none; width: auto; padding: 8px 15px; background:#13c2c2;">导出数据</button>
           <button class="modal-btn modal-btn-confirm" id="importDataBtn" style="flex: none; width: auto; padding: 8px 15px; background:#722ed1;">导入数据</button>
+        </div>
+        <!-- 新增门店列表收起展开头部 -->
+        <div class="user-list-header">
+          <span>门店账号列表</span>
+          <span class="user-list-toggle" id="toggleUserList">收起</span>
         </div>
         <div id="userList" style="max-height:250px; overflow-y:auto; margin-bottom:15px;">
           <!-- 用户列表（门店账号） -->
@@ -660,6 +684,8 @@ const JSONBIN_CONFIG = {
       jsonbinApiKeyInput: document.getElementById('jsonbinApiKeyInput'),
       cancelJsonbinSetting: document.getElementById('cancelJsonbinSetting'),
       saveJsonbinSetting: document.getElementById('saveJsonbinSetting'),
+      // 新增门店列表收起展开按钮
+      toggleUserList: document.getElementById('toggleUserList'),
     };
 
     // --------------- 基础工具函数 ---------------
@@ -982,6 +1008,12 @@ const JSONBIN_CONFIG = {
           el.jsonbinSettingModal.style.display = 'flex';
         };
         document.querySelector('#userInfoBar div').appendChild(jsonbinSettingBtn);
+      } else {
+        // 非管理员移除后台设置按钮
+        const jsonbinSettingBtn = document.getElementById('jsonbinSettingBtn');
+        if (jsonbinSettingBtn) {
+          jsonbinSettingBtn.remove();
+        }
       }
       
       // 更新用户信息
@@ -1157,6 +1189,16 @@ const JSONBIN_CONFIG = {
           el.toggleUseLog.textContent = '展开';
         }
       });
+      // 绑定门店列表收起/展开
+      el.toggleUserList.addEventListener('click', () => {
+        if (el.userList.style.display === 'none') {
+          el.userList.style.display = 'block';
+          el.toggleUserList.textContent = '收起';
+        } else {
+          el.userList.style.display = 'none';
+          el.toggleUserList.textContent = '展开';
+        }
+      });
       
       // 新增手动同步按钮
       if (!document.getElementById('manualSyncBtn')) {
@@ -1197,6 +1239,7 @@ const JSONBIN_CONFIG = {
             <button class="edit-btn" data-id="${user.id}">编辑</button>
             <button class="reset-pwd-btn" data-id="${user.id}" data-name="${user.username}">重置密码</button>
             ${statusBtn}
+            <button class="delete-btn" data-id="${user.id}" data-name="${user.username}">删除</button>
           </div>
         `;
         el.userList.appendChild(item);
@@ -1238,6 +1281,25 @@ const JSONBIN_CONFIG = {
           el.newStorePwd.value = '';
           el.confirmNewStorePwd.value = '';
           el.resetStorePwdModal.style.display = 'flex';
+        });
+      });
+      // 绑定删除门店账号
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const userId = btn.getAttribute('data-id');
+          const userName = btn.getAttribute('data-name');
+          if (confirm(`确定删除门店账号【${userName}】吗？此操作不可恢复！`)) {
+            const userIndex = GLOBAL_DATA.userList.findIndex(u => u.id === userId);
+            if (userIndex !== -1) {
+              GLOBAL_DATA.userList.splice(userIndex, 1);
+              await saveToRepo();
+              renderUserList();
+              showToast('门店账号已删除');
+              recordUseLog(`删除门店账号：${userName}`);
+            } else {
+              showToast('门店账号不存在');
+            }
+          }
         });
       });
     }
@@ -1905,7 +1967,4 @@ const JSONBIN_CONFIG = {
     bindEvents();
   </script>
 </body>
-</html>  
-
-
-      
+</html>
